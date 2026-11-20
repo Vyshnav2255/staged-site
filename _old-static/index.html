@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staged · Commit your work. Properly.</title>
+<meta name="description" content="Staged sorts your uncommitted changes into clean commits and writes the messages. Add them to the cart, hold to push, get a receipt. Free, local, no AI, no account.">
+<meta property="og:title" content="Staged · Commit your work. Properly.">
+<meta property="og:description" content="Sorts your uncommitted changes into clean commits and writes the messages. Free, local, no AI, no account.">
+<meta property="og:image" content="img/demo-light-poster.webp">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preload" href="fonts/Akt-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Akt"; src: url("fonts/Akt-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+:root {
+  --bg: #f3f2ee; --surface: #ffffff; --raised: #ffffff; --well: #ebeae5;
+  --line: #e4e2dc; --line-strong: #cfcdc5; --dash: 1px dashed var(--line-strong);
+  --ink: #0b0b0b; --ink-2: #3d3c38; --muted: #7d7b74;
+  --g1: #c4e35a; --g2: #3fae5f; --g3: #1f9a6a;
+  --ring: 0 0 0 1px rgb(0 0 0 / .06), 0 1px 2px rgb(0 0 0 / .05), 0 12px 32px -14px rgb(0 0 0 / .18);
+  --ease: cubic-bezier(.23, 1, .32, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0b0b0b; --surface: #151514; --raised: #1b1b1a; --well: #121211; --line: #262624; --line-strong: #3a3a35;
+    --ink: #f0efec; --ink-2: #c3c2b7; --muted: #8a8880; --g2: #4cbb6c;
+    --ring: 0 0 0 1px rgb(255 255 255 / .07), 0 1px 2px rgb(0 0 0 / .5), 0 18px 40px -16px rgb(0 0 0 / .8); }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.55 "Akt", ui-sans-serif, system-ui, sans-serif; font-feature-settings: "ss02", "cv02", "cv03", "calt", "kern"; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+a { color: inherit; }
+img, video { display: block; max-width: 100%; height: auto; }
+.mono { font-family: "Geist Mono", ui-monospace, monospace; }
+.wrap { width: min(1080px, 100% - 40px); margin-inline: auto; }
+.narrow { width: min(720px, 100% - 40px); margin-inline: auto; }
+
+/* nav */
+.nav { position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); background: color-mix(in srgb, var(--bg) 80%, transparent); border-bottom: 1px solid transparent; transition: border-color .2s ease; }
+.nav.is-stuck { border-bottom-color: var(--line); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.brand { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; font-weight: 600; font-size: 19px; letter-spacing: -.035em; }
+.brand svg { position: relative; top: 1px; }
+.nav-links { display: flex; align-items: center; gap: 4px; }
+.nav-links a.link { padding: 8px 10px; border-radius: 8px; color: var(--ink-2); text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; transition: color .15s ease, background-color .15s ease; }
+.nav-links a.link:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 10px; border: 0; background: var(--ink); color: var(--bg); font: 500 14px "Akt", sans-serif; text-decoration: none; cursor: pointer; box-shadow: inset 0 1px 0 rgb(255 255 255 / .14), 0 1px 2px rgb(0 0 0 / .2); transition: transform .15s var(--ease), opacity .15s ease; }
+.btn:hover { opacity: .9; }
+.btn:active { transform: scale(.97); }
+.btn.big { height: 48px; padding: 0 22px; border-radius: 13px; font-size: 16px; }
+
+/* hero */
+.hero { text-align: center; padding: 64px 0 0; }
+.hero-icon { width: 72px; height: 72px; margin-inline: auto; border-radius: 18px; box-shadow: 0 0 0 1px var(--line), 0 18px 40px -12px rgb(31 154 106 / .45); }
+.badge { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; padding: 5px 12px 5px 6px; border-radius: 99px; background: var(--surface); box-shadow: var(--ring); font-size: 13px; color: var(--ink-2); }
+.badge b { font: 500 11px "Geist Mono", monospace; padding: 3px 7px; border-radius: 99px; color: var(--g3); background: color-mix(in srgb, var(--g2) 16%, var(--surface)); }
+h1 { margin: 22px auto 0; max-width: 13ch; font-size: clamp(42px, 7.2vw, 78px); line-height: 1.02; letter-spacing: -.045em; font-weight: 600; text-wrap: balance; }
+h1 em { font-style: normal; background: linear-gradient(90deg, var(--g1), var(--g2) 55%, var(--g3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sub { margin: 20px auto 0; max-width: 33em; font-size: clamp(16px, 2vw, 19px); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.cta { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.or { display: flex; align-items: center; gap: 12px; width: min(420px, 100%); color: var(--muted); font-size: 12.5px; }
+.or::before, .or::after { content: ""; flex: 1; border-top: var(--dash); }
+.cmd { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; padding: 6px 6px 6px 14px; border-radius: 12px; background: var(--surface); box-shadow: var(--ring); font-size: 13px; color: var(--ink-2); }
+.cmd code { font: inherit; white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
+.cmd code::-webkit-scrollbar { display: none; }
+.cmd code b { font-weight: 400; color: var(--g3); }
+.copy { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--raised); color: var(--ink-2); font: 500 12px "Akt", sans-serif; cursor: pointer; transition: color .15s ease, border-color .15s ease, transform .15s var(--ease); }
+.copy:hover { color: var(--ink); border-color: var(--line-strong); }
+.copy:active { transform: scale(.96); }
+.copy.is-done { color: var(--g3); border-color: color-mix(in srgb, var(--g2) 50%, var(--line)); }
+.meta { margin-top: 2px; font-size: 12px; color: var(--muted); }
+.meta span + span::before { content: "·"; margin: 0 8px; }
+
+/* the app window around screenshots and the demo */
+.window { position: relative; border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: var(--ring); }
+.window-bar { display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px; border-bottom: var(--dash); background: var(--surface); }
+.window-bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--line-strong); }
+.window-bar span { margin-left: auto; margin-right: auto; padding-right: 52px; font: 500 11.5px "Geist Mono", monospace; color: var(--muted); }
+.demo { margin: 56px auto 0; max-width: 1080px; }
+.demo .window { border-radius: 16px; box-shadow: var(--ring), 0 50px 100px -50px rgb(31 154 106 / .35); }
+.demo video { width: 100%; aspect-ratio: 1600 / 1000; object-fit: cover; background: var(--well); }
+.demo-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
+
+/* sections */
+section { padding: 120px 0 0; }
+.kicker { font: 500 12.5px "Geist Mono", monospace; color: var(--g3); letter-spacing: .01em; }
+h2 { margin: 10px 0 0; font-size: clamp(30px, 4.4vw, 46px); line-height: 1.06; letter-spacing: -.035em; font-weight: 600; max-width: 19ch; text-wrap: balance; }
+.lead { margin: 14px 0 0; max-width: 36em; color: var(--ink-2); font-size: 17px; text-wrap: pretty; }
+
+/* what it does: four tiles */
+.tiles { margin-top: 44px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tile { display: flex; flex-direction: column; border-radius: 18px; background: var(--surface); box-shadow: var(--ring); overflow: hidden; }
+.tile-text { padding: 24px 24px 20px; }
+.tile h3 { margin: 0; font-size: 19px; letter-spacing: -.02em; font-weight: 600; }
+.tile p { margin: 6px 0 0; font-size: 15px; color: var(--ink-2); text-wrap: pretty; }
+.tile-shot { margin: 0 24px; border-radius: 12px 12px 0 0; overflow: hidden; box-shadow: 0 0 0 1px var(--line); aspect-ratio: 4 / 3; margin-top: auto; background: var(--well); }
+.tile-shot img { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+
+/* the longer reads under the tiles */
+.reads { margin-top: 56px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; }
+.read { padding: 22px 0; border-top: var(--dash); }
+.read h4 { margin: 0; font-size: 15.5px; font-weight: 600; letter-spacing: -.01em; }
+.read p { margin: 6px 0 0; font-size: 15px; color: var(--ink-2); text-wrap: pretty; }
+.read ul { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 7px; font-size: 14.5px; color: var(--ink-2); }
+.read li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: start; }
+.read li svg { margin-top: 3px; color: var(--g2); }
+
+/* history band */
+.history { margin-top: 44px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.history figure { margin: 0; }
+.history figcaption { margin-top: 12px; font-size: 14px; color: var(--muted); }
+.history figcaption b { color: var(--ink); font-weight: 600; }
+
+/* how it's different */
+.three { margin-top: 44px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.card { padding: 24px; border-radius: 18px; background: var(--surface); box-shadow: var(--ring); transition: transform .3s var(--ease); }
+.card:hover { transform: translateY(-2px); }
+.card-ico { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; color: var(--g3); background: color-mix(in srgb, var(--g2) 15%, var(--surface)); }
+.card h3 { margin: 18px 0 0; font-size: 17.5px; letter-spacing: -.02em; font-weight: 600; }
+.card p { margin: 6px 0 0; font-size: 14.5px; color: var(--ink-2); text-wrap: pretty; }
+
+/* faq */
+.faq { margin-top: 36px; }
+.faq details { border-top: var(--dash); }
+.faq details:last-child { border-bottom: var(--dash); }
+.faq summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 2px; cursor: pointer; font-weight: 500; font-size: 16.5px; letter-spacing: -.01em; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary svg { flex: none; color: var(--muted); transition: transform .25s var(--ease), color .15s ease; }
+.faq details[open] summary svg { transform: rotate(45deg); }
+.faq summary:hover svg { color: var(--ink); }
+.faq p { margin: 0; padding: 0 2px 20px; max-width: 40em; color: var(--ink-2); text-wrap: pretty; }
+.faq em { font-style: normal; color: var(--ink); font-weight: 500; }
+.faq code { font: 13px "Geist Mono", monospace; padding: 2px 6px; border-radius: 6px; background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
+
+.closing { text-align: center; padding-top: 128px; }
+.closing h2 { margin-inline: auto; }
+.closing .cta { margin-top: 28px; }
+
+footer { margin-top: 120px; border-top: var(--dash); padding: 28px 0 44px; font-size: 13.5px; color: var(--muted); }
+footer .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; }
+footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+footer a { color: var(--ink-2); text-decoration: none; }
+footer a:hover { color: var(--ink); }
+
+/* rise in on scroll */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.reveal.is-in { opacity: 1; transform: none; }
+
+@media (max-width: 860px) {
+  .hero { padding-top: 44px; }
+  section { padding-top: 88px; }
+  .tiles, .reads, .history, .three { grid-template-columns: 1fr; }
+  .reads { gap: 0; }
+  .nav-links a.link span { display: none; }
+  .window-bar span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .card:hover, .btn:active, .copy:active { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Staged">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true"><path d="M18 18H6C5.05719 18 4.58579 18 4.29289 17.7071C4 17.4142 4 16.9428 4 16C4 15.0572 4 14.5858 4.29289 14.2929C4.58579 14 5.05719 14 6 14H18C18.9428 14 19.4142 14 19.7071 14.2929C20 14.5858 20 15.0572 20 16C20 16.9428 20 17.4142 19.7071 17.7071C19.4142 18 18.9428 18 18 18Z" fill="#1f9a6a" fill-opacity=".18" stroke="#1f9a6a" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 10H20" stroke="#4cbb6c" stroke-width="1.75" stroke-linecap="round"/><path d="M4 6H20" stroke="#c4e35a" stroke-width="1.75" stroke-linecap="round"/></svg>
+      staged
+    </a>
+    <nav class="nav-links">
+      <a class="link" href="#what">What it does</a>
+      <a class="link" href="#questions">Questions</a>
+      <a class="link" href="https://github.com/Vyshnav2255/staged" rel="noopener"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" aria-hidden="true"><path d="M10 20.5675C6.57143 21.7248 3.71429 20.5675 2 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 22V18.7579C10 18.1596 10.1839 17.6396 10.4804 17.1699C10.6838 16.8476 10.5445 16.3904 10.1771 16.2894C7.13394 15.4528 5 14.1077 5 9.64606C5 8.48611 5.38005 7.39556 6.04811 6.4464C6.21437 6.21018 6.29749 6.09208 6.31748 5.9851C6.33746 5.87813 6.30272 5.73852 6.23322 5.45932C5.95038 4.32292 5.96871 3.11619 6.39322 2.02823C6.39322 2.02823 7.27042 1.74242 9.26698 2.98969C9.72282 3.27447 9.95075 3.41686 10.1515 3.44871C10.3522 3.48056 10.6206 3.41384 11.1573 3.28041C11.8913 3.09795 12.6476 3 13.5 3C14.3524 3 15.1087 3.09795 15.8427 3.28041C16.3794 3.41384 16.6478 3.48056 16.8485 3.44871C17.0493 3.41686 17.2772 3.27447 17.733 2.98969C19.7296 1.74242 20.6068 2.02823 20.6068 2.02823C21.0313 3.11619 21.0496 4.32292 20.7668 5.45932C20.6973 5.73852 20.6625 5.87813 20.6825 5.9851C20.7025 6.09207 20.7856 6.21019 20.9519 6.4464C21.6199 7.39556 22 8.48611 22 9.64606C22 14.1077 19.8661 15.4528 16.8229 16.2894C16.4555 16.3904 16.3162 16.8476 16.5196 17.1699C16.8161 17.6396 17 18.1596 17 18.7579V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>GitHub</span></a>
+      <a class="btn" href="#get">Get Staged</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero wrap">
+    <img class="hero-icon" src="img/staged-icon.svg" width="72" height="72" alt="">
+    <div class="badge"><b>v0.2.0</b>Now with a cart, hold to push and push receipts</div>
+    <h1>Commit your work. <em>Properly.</em></h1>
+    <p class="sub">Staged sorts the changes on your computer into clean commits and writes the messages. You check them, add them to the cart, and hold to push.</p>
+    <div class="cta" id="get">
+      <a class="btn big" href="https://github.com/Vyshnav2255/staged" rel="noopener">Get Staged on GitHub</a>
+      <div class="or">or paste this in a terminal</div>
+      <div class="cmd mono"><code><b>git clone</b> https://github.com/Vyshnav2255/staged.git <b>&amp;&amp; cd</b> staged <b>&amp;&amp; npm</b> start</code><button class="copy" data-copy="git clone https://github.com/Vyshnav2255/staged.git &amp;&amp; cd staged &amp;&amp; npm start" aria-label="Copy the command">Copy</button></div>
+      <div class="meta mono"><span>Free</span><span>v0.2.0</span><span>Mac, Windows and Linux</span><span>Node 18+ and git</span></div>
+    </div>
+    <div class="demo reveal">
+      <div class="window">
+        <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>localhost · staged</span></div>
+        <video autoplay muted loop playsinline preload="metadata" poster="img/demo-light-poster.webp" aria-label="Staged in use: a suggested commit is added to the cart, the button is held to push, and a receipt prints.">
+          <source src="img/demo-dark.mp4" type="video/mp4" media="(prefers-color-scheme: dark)">
+          <source src="img/demo-light.mp4" type="video/mp4">
+        </video>
+      </div>
+      <p class="demo-note">Add a commit to the cart, hold to push, and a receipt prints.</p>
+    </div>
+  </div>
+
+  <section class="wrap" id="what">
+    <div class="kicker">what it does</div>
+    <h2>The commits you meant to make.</h2>
+    <p class="lead">You worked on three things at once and now forty files have changed. Staged untangles them, so every commit is one thing with a message that says what it is.</p>
+
+    <div class="tiles">
+      <article class="tile reveal">
+        <div class="tile-text"><h3>Sorts your changes</h3><p>A new feature travels with its styles and the lines that hook it in.</p></div>
+        <div class="tile-shot"><picture><source srcset="img/sort-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/sort-light.webp" loading="lazy" width="960" height="720" alt="Three suggested commits, each with a written message: a label printer, a guide update and a README update."></picture></div>
+      </article>
+      <article class="tile reveal">
+        <div class="tile-text"><h3>Writes the message</h3><p>In the style your repo already uses, or the one you pick for it.</p></div>
+        <div class="tile-shot"><picture><source srcset="img/style-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/style-light.webp" loading="lazy" width="720" height="540" alt="Project settings: commit messages set to Auto, with Gitmoji, Conventional and Both as choices."></picture></div>
+      </article>
+      <article class="tile reveal">
+        <div class="tile-text"><h3>Fills a cart</h3><p>Commits wait in the cart until you hold to push. Undo is one click.</p></div>
+        <div class="tile-shot"><picture><source srcset="img/cart-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/cart-light.webp" loading="lazy" width="720" height="540" alt="The cart: a commit just added, with Undo, above four commits waiting to push."></picture></div>
+      </article>
+      <article class="tile reveal">
+        <div class="tile-text"><h3>Prints a receipt</h3><p>Every push ends with a receipt of what went out, ready to save.</p></div>
+        <div class="tile-shot"><picture><source srcset="img/receipt-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/receipt-light.webp" loading="lazy" width="720" height="540" alt="The bottom of a push receipt: total lines, a QR code and a green Shipped stamp."></picture></div>
+      </article>
+    </div>
+
+    <div class="reads">
+      <div class="read reveal">
+        <h4>How it sorts</h4>
+        <p>Staged follows real imports, names a change adds in one file and uses in another, and the files you usually commit together. When one file holds two features, it splits the file by chunk and gives each commit its own part.</p>
+        <ul><li><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true"><path d="M5 14L8.5 17.5L19 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Drag a file to another commit and it remembers next time</li><li><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true"><path d="M5 14L8.5 17.5L19 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Warns before a key or a huge file goes in</li></ul>
+      </div>
+      <div class="read reveal">
+        <h4>How it writes</h4>
+        <p>Subjects say what changed for someone using your app: <em>Added a label printer</em>, not <em>Update sound.js</em>. It reads the comments you wrote and the names you added. Auto follows your history, or set Gitmoji, Conventional Commits or both for each project.</p>
+      </div>
+      <div class="read reveal">
+        <h4>The cart</h4>
+        <p>Adding a commit to the cart makes it, right there on your branch. The cart shows everything that hasn't been pushed yet, so you can look it over once more. Changed your mind? Undo puts the last one back in your changes.</p>
+      </div>
+      <div class="read reveal">
+        <h4>Hold to push</h4>
+        <p>Pushing is a deliberate hold, never a stray click. Let go early and nothing happens. When it goes through, a receipt prints with the commits, files and lines, and a QR code to see the changes on GitHub.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="history">
+    <div class="kicker">your history</div>
+    <h2>Read your repo like a story.</h2>
+    <p class="lead">Weeks, features and releases instead of a wall of hashes, and a tree of every branch and merge.</p>
+    <div class="history">
+      <figure class="reveal"><div class="window"><div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>Weeks</span></div><picture><source srcset="img/weeks-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/weeks-light.webp" loading="lazy" width="1520" height="1140" alt="A repo by week: commits, lines changed and features shipped, then this week’s commits by type."></picture></div><figcaption><b>Weeks.</b> What you shipped, by type, week by week.</figcaption></figure>
+      <figure class="reveal"><div class="window"><div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>Tree</span></div><picture><source srcset="img/tree-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/tree-light.webp" loading="lazy" width="1520" height="1140" alt="The tree: every commit on main as a lane, with the branch and remote marked."></picture></div><figcaption><b>Tree.</b> Branches, merges and tags drawn as lanes.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="wrap" id="different">
+    <div class="kicker">how it's different</div>
+    <h2 style="max-width:24ch">Most git tools make you sort. Staged sorts, then asks.</h2>
+    <div class="three">
+      <div class="card reveal">
+        <div class="card-ico"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22Z" stroke="currentColor" stroke-width="1.5"/><path d="M8.5 12.5L10.5 14.5L15.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Local, no AI</h3>
+        <p>No account, no server of ours and no model. Staged reads your repos in place and works out the commits on its own, offline and instantly.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-ico"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true"><path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="currentColor" stroke-width="1.5"/><path d="M8 12H16M12 8V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <h3>It only suggests</h3>
+        <p>Nothing is committed until you add it to the cart, and nothing is pushed until you hold the button. You can change any group or message first.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-ico"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true"><path d="M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C9.5 21 7.2 19.98 5.6 18.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3 7V12H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Undo by default</h3>
+        <p>Discarded changes go to a trash you can restore from, and the last commit has an Undo. Staged's settings live outside your repos.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="narrow" id="questions">
+    <div class="kicker">questions</div>
+    <h2>Good to know.</h2>
+    <div class="faq">
+      <details open><summary>Is it free?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>Yes. There is no paid tier, no trial and no account.</p></details>
+      <details><summary>Does my code leave my computer?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>No. Staged is a small app that runs on your computer and reads your repos where they are. Grouping and messages come from its own rules, so there is no AI service, no server of ours and nothing to send anywhere. The only time anything goes out is when you push, and that goes to your own remote.</p></details>
+      <details><summary>Does it use AI?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>No. Staged reads the diff itself: real imports, names a change adds and uses, which files you usually commit together, the comments you wrote. That is enough to sort a pile of changes and write subjects like <em>Added a label printer</em>, instantly and offline.</p></details>
+      <details><summary>Will it commit or push without asking?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>No. It only suggests. A commit is made when you add it to the cart, and nothing reaches your remote until you hold the push button. The last commit has an Undo.</p></details>
+      <details><summary>What if it groups something wrong?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>Drag a file onto another commit, or onto <em>Drop here for a new commit</em>. Staged remembers the move and groups those files together next time. A file that holds two features is split by chunk, and you can pick chunks yourself.</p></details>
+      <details><summary>Can I choose the message style?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>Yes, per project. Auto follows the style your repo already uses. You can also pick Gitmoji, Conventional Commits, or both, from the gear next to the repo name.</p></details>
+      <details><summary>What's the receipt?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>After every push Staged prints a small receipt of what went out: the commits, files and lines, with a QR code to the changes on GitHub. Save it as an image if you like sharing your work.</p></details>
+      <details><summary>What do I need to run it?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>Node 18 or newer and git. Clone the repo and run <code>npm start</code>. It opens in your browser at <code>localhost</code> and updates itself when a new release is out.</p></details>
+      <details><summary>Which repos does it show?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>It finds the folder your repos live in, such as <code>~/GitHub</code> or <code>~/Developer</code>, and lists every git repo inside. You can add folders, add single repos, or hide one.</p></details>
+      <details><summary>Does it work with GitLab and others?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>Yes. It works on the git repo on your disk, so the host does not matter. Push goes wherever your remote points.</p></details>
+      <details><summary>How do I remove it?<svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></summary><p>Delete the folder you cloned. Its own settings live in <code>~/.config/staged</code>, never in your repos, so delete that too if you want a clean slate.</p></details>
+    </div>
+  </section>
+
+  <section class="wrap closing">
+    <img class="hero-icon" src="img/staged-icon.svg" width="60" height="60" alt="" style="width:60px;height:60px;border-radius:15px">
+    <h2 style="margin-top:22px">Your next commit, already sorted.</h2>
+    <div class="cta">
+      <a class="btn big" href="https://github.com/Vyshnav2255/staged" rel="noopener">Get Staged on GitHub</a>
+      <div class="cmd mono"><code><b>git clone</b> https://github.com/Vyshnav2255/staged.git <b>&amp;&amp; cd</b> staged <b>&amp;&amp; npm</b> start</code><button class="copy" data-copy="git clone https://github.com/Vyshnav2255/staged.git &amp;&amp; cd staged &amp;&amp; npm start" aria-label="Copy the command">Copy</button></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top" style="font-size:16px" aria-label="Staged"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true"><path d="M18 18H6C5.05719 18 4.58579 18 4.29289 17.7071C4 17.4142 4 16.9428 4 16C4 15.0572 4 14.5858 4.29289 14.2929C4.58579 14 5.05719 14 6 14H18C18.9428 14 19.4142 14 19.7071 14.2929C20 14.5858 20 15.0572 20 16C20 16.9428 20 17.4142 19.7071 17.7071C19.4142 18 18.9428 18 18 18Z" fill="#1f9a6a" fill-opacity=".18" stroke="#1f9a6a" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 10H20" stroke="#4cbb6c" stroke-width="1.75" stroke-linecap="round"/><path d="M4 6H20" stroke="#c4e35a" stroke-width="1.75" stroke-linecap="round"/></svg> staged</a>
+    <nav>
+      <a href="#what">What it does</a>
+      <a href="#different">How it's different</a>
+      <a href="#questions">Questions</a>
+      <a href="https://github.com/Vyshnav2255/staged" rel="noopener">GitHub</a>
+      <a href="https://github.com/Vyshnav2255/staged/releases" rel="noopener">Changelog</a>
+    </nav>
+    <span>Made by <a href="https://x.com/vyshnav_xyz" rel="noopener">Vyshnav</a></span>
+  </div>
+</footer>
+
+<script>
+  for (const b of document.querySelectorAll('[data-copy]')) b.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(b.dataset.copy); } catch { return; }
+    b.textContent = 'Copied'; b.classList.add('is-done');
+    setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('is-done'); }, 1600);
+  });
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('is-stuck', scrollY > 8);
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  // The poster follows the colour scheme too (source media only picks the video file).
+  const v = document.querySelector('.demo video'), dark = matchMedia('(prefers-color-scheme: dark)');
+  const poster = () => { v.poster = dark.matches ? 'img/demo-dark-poster.webp' : 'img/demo-light-poster.webp'; };
+  poster(); dark.addEventListener?.('change', () => { poster(); v.load(); });
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.pause(); v.controls = true; }
+  const io = new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }, { rootMargin: '0px 0px -8% 0px' });
+  for (const el of document.querySelectorAll('.reveal')) io.observe(el);
+</script>
+</body>
+</html>

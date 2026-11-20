@@ -1,0 +1,520 @@
+/* Features grid: seven cards on 12 columns, each with one line drawing in soft
+   greys, cream and the brand green. Light and airy: nothing in the art is dark.
+
+   THE DRAWING RULES (every card follows all of them; audit against this list)
+   1. Stage     Each drawing is laid out on a fixed board, 388x270 (wide cards
+                794x270), pinned to the bottom centre of the card and scaled down
+                as a whole on narrower cards. The ink lives in the board's 24px
+                inset: it starts at y=24, stands on the floor at y=246 and never
+                crosses x=24 or x=364 (770). So every drawing begins the same
+                distance under the copy and ends the same distance above the edge.
+                Under 600px the two wide cards swap to a 388 drawing of their own
+                (.stage.is-phone), built from the same objects.
+                The board is the plain white card: no dot grid, no texture.
+   2. Fills     Still a line drawing: every object keeps its 1px outline. Objects
+                are filled in, flat, from five light tones and nothing else:
+                  paper   white (--a-paper): panel bodies, the receipt, an empty
+                          slot, a hollow marker
+                  fill    cream (--a-fill): what you could pick up or read as a
+                          strip: chips, cart rows, panel headers, a removed
+                          line, the bin, the printer, the mouse pointer
+                  fill-2  light grey (--a-fill2): the quiet solids: history
+                          blocks, a count badge, the second commit's files,
+                          the bin's rim and lid
+                  tint    green tint (--a-tint): the selected or changed
+                          surface: the accent row, added lines, the total
+                  green   solid --a-acc with --a-on text: one action or state
+                          per card (see rule 4)
+                No black, no dark grey, no shadows, no gradients, no glows.
+                The only grey solids are small marks in the stroke grey (--a-ink2).
+   3. Strokes   1px everywhere, all soft greys. Tone says the role:
+                  ink   object outlines (panel, chip, row, button, bin, printer,
+                        paper), ticks, stems
+                  ink-2 a touch deeper: wires, lanes, the baseline, markers,
+                        small solid marks (a filled dot, the barcode)
+                  line  dashed guides and dividers
+                Dashes are always 3 3.
+   4. Accent    One green idea per card: the thing the card is about. It is
+                drawn 1.5px in --a-acc and may use, at most, one tinted surface
+                group, ONE solid green fill and one lime detail:
+                  Sort     first commit + its files tinted; solid count badge
+                  Write    added lines + message outlined; solid "your style" tag
+                  Cart     incoming row tinted; solid count badge
+                  Hold     solid progress fill in the button (+ the ruler, the tick)
+                  Receipt  slot + total band tinted; lime lamp (no solid)
+                  Undo     restored row + file tinted; green arc (no solid)
+                  History  feature lane + nodes tinted; solid branch label and
+                           this week's blocks
+                Nothing else is green. Numbers and stats stay grey.
+   5. Objects   Four shapes, always the same:
+                  chip   24 high, radius 6, 8px inset   (file, ref, tag, key)
+                  row    32 high, radius 8, 10px inset  (a commit; 58 with two lines)
+                  panel  radius 12, 30px cream header with a line-toned rule
+                  badge  18 high pill, no outline: fill-2, or solid green (.is-on)
+                Markers: file = 6px square, commit = 8px circle, ref = 6px circle.
+                A solid green chip is .chip.is-on.
+   6. Type      Two sizes only. Geist Mono 11/14 for code, file names, refs,
+                numbers and captions; Akt 13/18 for labels and commit subjects
+                (500, or 600 for the one that matters). Text is grey, never black:
+                  key    the one label that matters per card (--a-key)
+                  text   labels, file names, commit subjects (--a-text)
+                  text-2 code, numbers, secondary labels (--a-text2)
+                  mute   captions, line numbers, stats (--a-mute)
+                Text on solid green is --a-on.
+   7. Motion    One short story per card that holds its end state; rest is a
+                complete picture. The story plays while the card has .is-play
+                (set in components/features.jsx: pointer over the card, or the
+                card 60% in view on a touch screen; a tap replays). Things
+                travel on --a-ease, land on --a-spring, colours change in .2s,
+                staggers step 40ms, and every story is over within 2.4s (the
+                Hold fill really takes its 1.4s).
+   8. Data      Every card shows the same push as the try-it cart
+                (components/features/data.js): feat(printer) +186 -4,
+                docs(guide) +41 -12, fix(sidebar) +19 -5, total +246 -21.
+   Tokens come from globals.css; every var() carries the spec value as a fallback. */
+
+/* The art's colours are registered so they can cross-fade (blueprint mode). */
+@property --a-paper { syntax: '<color>'; inherits: true; initial-value: #fff; }
+@property --a-line { syntax: '<color>'; inherits: true; initial-value: #e1ded6; }
+@property --a-ink { syntax: '<color>'; inherits: true; initial-value: #c6c2b9; }
+@property --a-ink2 { syntax: '<color>'; inherits: true; initial-value: #b4b0a7; }
+@property --a-key { syntax: '<color>'; inherits: true; initial-value: #45433d; }
+@property --a-text { syntax: '<color>'; inherits: true; initial-value: #5c5a53; }
+@property --a-text2 { syntax: '<color>'; inherits: true; initial-value: #77756e; }
+@property --a-mute { syntax: '<color>'; inherits: true; initial-value: #9a978e; }
+@property --a-acc { syntax: '<color>'; inherits: true; initial-value: #1f9a6a; }
+@property --a-lime { syntax: '<color>'; inherits: true; initial-value: #c4e35a; }
+@property --a-tint { syntax: '<color>'; inherits: true; initial-value: #e7f5eb; }
+@property --a-fill { syntax: '<color>'; inherits: true; initial-value: #f7f6f2; }
+@property --a-fill2 { syntax: '<color>'; inherits: true; initial-value: #eeece6; }
+@property --a-on { syntax: '<color>'; inherits: true; initial-value: #fff; }
+
+.bento {
+  /* strokes (rule 3) and text (rule 6): soft greys, nothing dark */
+  --a-paper: #fff; --a-line: #e1ded6; --a-ink: #c6c2b9; --a-ink2: #b4b0a7;
+  --a-key: #45433d; --a-text: #5c5a53; --a-text2: var(--muted, #77756e); --a-mute: #9a978e;
+  --a-acc: var(--g3, #1f9a6a); --a-lime: var(--g1, #c4e35a); --a-tint: #e7f5eb;
+  /* fills (rule 2): a cream lighter than the page, one light grey, and the text on solid green */
+  --a-fill: #f7f6f2; --a-fill2: #eeece6; --a-on: #fff;
+  --a-fade: .4s ease;
+  transition: --a-fill var(--a-fade), --a-fill2 var(--a-fade), --a-on var(--a-fade), --a-paper var(--a-fade), --a-line var(--a-fade), --a-ink var(--a-fade), --a-ink2 var(--a-fade), --a-mute var(--a-fade), --a-acc var(--a-fade), --a-lime var(--a-fade), --a-tint var(--a-fade), --a-key var(--a-fade), --a-text var(--a-fade), --a-text2 var(--a-fade);
+  /* motion (rule 7): travel, land, colour, stagger */
+  --a-ease: var(--ease, cubic-bezier(.23, 1, .32, 1));
+  --a-spring: linear(0, .009, .035 2.1%, .141 4.4%, .723 12.9%, .938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, .991, .977 51%, .974 53.8%, .975 57.1%, .997 69.8%, 1.003 76.9%, 1.004 83.8%, 1);
+  --a-t: .6s; --a-c: .2s; --a-step: 40ms;
+  position: relative; width: 100%; margin-top: 56px;
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: 400px; gap: 16px;
+}
+
+/* card: one white surface */
+.bento .feat {
+  grid-column: span 4; position: relative; isolation: isolate; min-width: 0;
+  display: flex; flex-direction: column; overflow: hidden;
+  border-radius: 16px; border: 1px solid var(--line, #e2e0d9);
+  background: var(--surface, #fff); box-shadow: var(--shadow-1, 0 1px 2px rgb(0 0 0 / .04));
+  color: inherit; text-decoration: none;
+  transition: opacity .6s var(--a-ease) calc(var(--i, 0) * 60ms), transform .6s var(--a-ease) calc(var(--i, 0) * 60ms), border-color .15s ease;
+}
+.bento .feat.wide { grid-column: span 8; }
+.bento .feat:is(:hover, .is-play) { border-color: color-mix(in srgb, var(--g2, #3fae5f) 40%, var(--line, #e2e0d9)); }
+
+.feat-head { position: relative; z-index: 2; padding: 24px 24px 0; }
+.bento .feat h3 { margin: 0; display: flex; align-items: center; gap: 8px; font: 600 16px/24px var(--font-akt), sans-serif; letter-spacing: -.015em; color: var(--ink, #0b0b0b); }
+.bento .feat p { margin: 6px 0 0; max-width: 44ch; font-size: 15px; line-height: 23px; color: var(--ink-2, #3d3c38); text-wrap: pretty; }
+
+/* drawing area: fills the rest of the card; plain white, no grid (rule 1) */
+.feat-art { position: relative; flex: 1; min-height: 240px; container-type: inline-size; }
+
+/* The stage (rule 1): a fixed 388x270 (wide: 794x270) board pinned to the bottom
+   centre. On a narrower card it scales down as a whole (tan(atan2()) turns the
+   two lengths into a plain ratio). */
+.stage { position: absolute; z-index: 1; left: 50%; bottom: 0; width: 388px; height: 270px; margin-left: -194px;
+  transform-origin: 50% 100%; scale: min(1, tan(atan2(100cqw, 388px))); }
+.stage.is-wide { width: 794px; margin-left: -397px; scale: min(1, tan(atan2(100cqw, 794px))); }
+.stage.is-phone { display: none; }
+.art { position: absolute; inset: 0; font: 500 13px/18px var(--font-akt), sans-serif; color: var(--a-text); letter-spacing: -.005em; user-select: none; -webkit-user-select: none; }
+.art :is(i, em, b) { font-style: normal; }
+.art b { font-weight: 600; white-space: nowrap; }
+.art .mono, .art .chip { font: 450 11px/14px var(--font-mono), ui-monospace, monospace; letter-spacing: 0; font-feature-settings: "kern"; font-variant-ligatures: none; white-space: nowrap; }
+.art svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.art svg :is(path, circle, ellipse, rect) { fill: none; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+
+/* the three objects (rule 5) */
+.art .chip { box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 1px solid var(--a-ink); border-radius: 6px; background: var(--a-fill); color: var(--a-text);
+  transition: border-color var(--a-c) ease, background-color var(--a-c) ease; }
+.art .row { box-sizing: border-box; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid var(--a-ink); border-radius: 8px; background: var(--a-fill); }
+.art .row b { font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.art .row .stat { flex: none; margin-left: auto; }
+.art .panel { box-sizing: border-box; position: absolute; border: 1px solid var(--a-ink); border-radius: 12px; background: var(--a-paper); }
+.art .panel-head { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-bottom: 1px solid var(--a-line); border-radius: 11px 11px 0 0; background: var(--a-fill); }
+.art .panel-head > :is(.mono, .badge):last-child { margin-left: auto; }
+.art .panel-head > .mono:last-child { color: var(--a-mute); }
+.art .badge { flex: none; box-sizing: border-box; display: inline-block; height: 18px; min-width: 18px; padding: 0 6px; border-radius: 9px; background: var(--a-fill2); color: var(--a-text2);
+  font: 500 11px/18px var(--font-mono), ui-monospace, monospace; letter-spacing: 0; font-variant-ligatures: none; text-align: center; white-space: nowrap; }
+.art .badge.is-on { background: var(--a-acc); color: var(--a-on); }
+/* the accent (rule 4) */
+.art .is-acc { border: 1.5px solid var(--a-acc); }
+.art :is(.chip, .row).is-acc { background: var(--a-tint); }
+.art .chip.is-on { border-color: var(--a-acc); background: var(--a-acc); color: var(--a-on); }
+.art .chip.is-on .rdot { border-color: var(--a-on); background: var(--a-on); }
+.art .chip.is-acc { padding: 0 7.5px; }
+.art .row.is-acc { padding: 0 9.5px; }
+.art .row.is-acc b { font-weight: 600; color: var(--a-key); }
+/* markers */
+.art .chip-dot { flex: none; box-sizing: border-box; width: 6px; height: 6px; border-radius: 1.5px; border: 1px solid var(--a-ink2); transition: background-color var(--a-c) ease, border-color var(--a-c) ease; }
+.art .chip.tone-2 { background: var(--a-paper); }
+.art .chip.tone-1 { background: var(--a-fill2); }
+.art .chip.tone-1 .chip-dot { background: var(--a-ink2); border-color: var(--a-ink2); }
+.art .chip.tone-0 { background: var(--a-tint); border-color: var(--a-acc); }
+.art .chip.tone-0 .chip-dot { background: var(--a-acc); border-color: var(--a-acc); }
+.art .cdot { flex: none; box-sizing: border-box; width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--a-ink2); background: var(--a-paper); }
+.art .is-acc .cdot { border: 1.5px solid var(--a-acc); background: var(--a-lime); }
+.art .rdot { flex: none; box-sizing: border-box; width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--a-ink2); }
+.art .is-acc .rdot { border-color: var(--a-acc); background: var(--a-acc); }
+.art .stat { color: var(--a-mute); }
+.art .stat b { font-weight: 450; color: var(--a-text2); }
+/* connectors drawn on the board: mute, with a small open arrowhead */
+.art .conn path { stroke: var(--a-ink2); }
+
+/* Blueprint mode (the Konami code): each drawing turns into a white-line plan on
+   blue-green paper with a grid, for ten seconds. Cross-fades in and out in 400ms. */
+.feat-art::after {
+  content: ""; position: absolute; inset: 12px 8px 8px; z-index: 0; border-radius: 10px; opacity: 0; pointer-events: none;
+  transition: opacity var(--a-fade);
+  background:
+    linear-gradient(rgb(178 236 229 / .12) 1px, transparent 1px) center bottom / 64px 64px,
+    linear-gradient(90deg, rgb(178 236 229 / .12) 1px, transparent 1px) center bottom / 64px 64px,
+    linear-gradient(rgb(178 236 229 / .05) 1px, transparent 1px) center bottom / 16px 16px,
+    linear-gradient(90deg, rgb(178 236 229 / .05) 1px, transparent 1px) center bottom / 16px 16px,
+    #0f3b3a;
+  box-shadow: inset 0 0 0 1px rgb(178 236 229 / .22);
+}
+.bp-tag {
+  position: absolute; top: 20px; right: 20px; z-index: 2; pointer-events: none;
+  height: 18px; padding: 0 6px; border-radius: 6px; border: 1px solid rgb(191 243 236 / .35);
+  font: 500 10px/16px var(--font-mono), ui-monospace, monospace; letter-spacing: .04em; color: #d9faf6;
+  opacity: 0; transition: opacity var(--a-fade);
+}
+.bento.is-blueprint {
+  --a-paper: #0f3b3a; --a-line: #3f7f7a; --a-ink: #eefcfa; --a-ink2: #c4ece7; --a-mute: #8fcac4;
+  --a-key: #fff; --a-text: #eefcfa; --a-text2: #c4ece7;
+  --a-acc: #fff; --a-lime: #bff3ec; --a-tint: #23655f;
+  --a-fill: #15484a; --a-fill2: #1c5654; --a-on: #0f3b3a;
+}
+.bento.is-blueprint .feat-art::after, .bento.is-blueprint .bp-tag { opacity: 1; }
+/* the fed-out receipt reaches the tag's corner, so the tag steps aside while it shows */
+.bento.is-blueprint .feat-receipt.is-play .bp-tag { opacity: 0; }
+
+/* Konami hint: a 20px keycap 12px under the grid's bottom-right corner, in the
+   section's empty space. Hover, focus or a tap shows the code to its left.
+   z-index keeps it above the next section, which starts right under the grid. */
+.konami { z-index: 5; position: absolute; top: calc(100% + 12px); right: 0; display: flex; align-items: center; }
+.konami-hint {
+  display: grid; place-items: center; width: 20px; height: 20px; padding: 0 0 1px; border-radius: 6px;
+  border: 1px solid var(--line, #e2e0d9); background: var(--surface, #fff); box-shadow: 0 1px 0 var(--line, #e2e0d9);
+  font: 500 11px/1 var(--font-mono), ui-monospace, monospace; color: color-mix(in srgb, var(--muted, #77756e) 70%, var(--surface, #fff)); cursor: help;
+  transition: color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s var(--a-ease);
+}
+.konami-hint span { display: block; transform: translateY(.5px); }
+.konami-hint:hover, .konami.is-open .konami-hint, .konami-hint:focus-visible { color: var(--ink-2, #3d3c38); border-color: var(--line-strong, #cbc8bf); box-shadow: 0 1px 0 var(--line-strong, #cbc8bf); }
+.konami-hint:active { transform: translateY(1px); box-shadow: none; }
+.konami-hint:focus-visible { outline: 2px solid color-mix(in srgb, var(--g2, #3fae5f) 55%, transparent); outline-offset: 2px; }
+.konami-tip {
+  position: absolute; right: calc(100% + 8px); top: 50%; white-space: nowrap; pointer-events: none;
+  height: 24px; padding: 0 8px; border-radius: 7px; display: flex; align-items: center; gap: 6px;
+  background: var(--ink, #0b0b0b); color: rgb(255 255 255 / .62); box-shadow: 0 4px 12px -4px rgb(0 0 0 / .3);
+  font: 500 11px/1 var(--font-mono), ui-monospace, monospace; letter-spacing: .02em;
+  opacity: 0; transform: translate(4px, -50%); transition: opacity .15s ease, transform .2s var(--a-ease);
+}
+.konami-tip b { font-weight: 500; color: #fff; letter-spacing: .08em; }
+.konami-tip::after { content: ""; position: absolute; left: 100%; top: 50%; margin-top: -4px; border: 4px solid transparent; border-left-color: var(--ink, #0b0b0b); border-right: 0; }
+.konami:hover .konami-tip, .konami.is-open .konami-tip, .konami-hint:focus-visible + .konami-tip { opacity: 1; transform: translate(0, -50%); }
+/* while blueprint mode runs, the keycap wears it too */
+.bento.is-blueprint .konami-hint { color: #d9faf6; background: #0f3b3a; border-color: #2f6b67; box-shadow: 0 1px 0 #2f6b67; }
+
+
+/* ───────── 1. Sort ───────── */
+.art-sort { touch-action: pan-y; }
+.art-sort .sort-label, .art-sort .sort-hint { position: absolute; left: 24px; top: 24px; color: var(--a-mute); transition: opacity var(--a-c) ease, transform var(--a-t) var(--a-ease); }
+.art-sort .sort-hint { opacity: 0; transform: translateY(4px); }
+.feat.is-play .art-sort .sort-label, .art-sort.is-held .sort-label { opacity: 0; transform: translateY(-4px); }
+.feat.is-play .art-sort .sort-hint, .art-sort.is-held .sort-hint { opacity: 1; transform: none; transition-delay: .25s; }
+
+.art-sort .wire { d: var(--w0); transition: d var(--a-t) var(--a-ease) calc(var(--k) * var(--a-step)); }
+.feat.is-play .art-sort .wire, .art-sort.is-held .wire { d: var(--w1); }
+.art-sort .wt-0 .wire-line { stroke: var(--a-acc); stroke-width: 1.5; }
+.art-sort .wt-1 .wire-line { stroke: var(--a-ink2); }
+.art-sort .wt-2 .wire-line { stroke: var(--a-ink2); stroke-dasharray: 3 3; }
+.art-sort .wire-pulse { stroke: var(--a-ink2); stroke-width: 3; stroke-dasharray: .001 2; stroke-dashoffset: .001; opacity: 0; }
+.art-sort .wt-0 .wire-pulse { stroke: var(--a-acc); stroke-width: 4; }
+.art-sort .wt-2 .wire-pulse { stroke: var(--a-ink2); }
+.feat.is-play .art-sort .wire-pulse { animation: sort-pulse 1s cubic-bezier(.5, 0, .3, 1) calc(.5s + var(--k) * var(--a-step)) both; }
+@keyframes sort-pulse { 0% { opacity: 0; stroke-dashoffset: .001; } 15%, 80% { opacity: 1; } 100% { opacity: 0; stroke-dashoffset: -1; } }
+
+/* a commit here is a two-line row: 58 high */
+.art-sort .commit { box-sizing: border-box; position: absolute; border: 1px solid var(--a-ink); border-radius: 8px; background: var(--a-paper); transition: border-color var(--a-c) ease, background-color var(--a-c) ease, transform var(--a-t) var(--a-spring); }
+.art-sort .commit .cdot { position: absolute; left: 12px; top: 12px; }
+.art-sort .commit > b { position: absolute; left: 28px; top: 7px; }
+.art-sort .commit > b { max-width: calc(100% - 68px); overflow: hidden; text-overflow: ellipsis; }
+.art-sort .commit .count { position: absolute; right: 10px; top: 7px; }
+.art-sort .commit .stat { position: absolute; right: 12px; top: 33px; }
+.art-sort .slots { position: absolute; left: 28px; top: 36px; display: flex; gap: 4px; }
+.art-sort .slot { box-sizing: border-box; width: 20px; height: 8px; border-radius: 3px; border: 1px dashed var(--a-ink2);
+  transition: background-color var(--a-c) ease calc(.3s + var(--n) * var(--a-step)), border-color var(--a-c) ease calc(.3s + var(--n) * var(--a-step)); }
+.feat.is-play .art-sort .slot, .art-sort.is-held .slot { border: 1px solid var(--a-ink); background: var(--a-fill2); }
+.feat.is-play .art-sort .c1 .slot, .art-sort.is-held .c1 .slot { border-color: var(--a-ink2); background: var(--a-ink2); }
+.feat.is-play .art-sort .c0 .slot, .art-sort.is-held .c0 .slot { border-color: var(--a-acc); background: var(--a-acc); }
+.art-sort .slot-in { animation: sort-slot var(--a-t) var(--a-spring) .25s backwards; }
+@keyframes sort-slot { from { transform: scaleX(0); } }
+.art-sort .c0 { border: 1.5px solid var(--a-acc); background: var(--a-tint); }
+.art-sort .c1 { background: var(--a-fill); }
+.art-sort .c0 > b { color: var(--a-key); }
+.art-sort .c0 .cdot { border: 1.5px solid var(--a-acc); background: var(--a-lime); }
+.art-sort .c1 .cdot { border-color: var(--a-ink2); background: var(--a-ink2); }
+.art-sort .commit.is-target { border-color: var(--a-acc); background: var(--a-tint); transform: scale(1.02); }
+
+.art-sort .pile { position: absolute; left: 0; top: 0; cursor: grab; touch-action: none;
+  transform: translate(var(--x0), var(--y0)) translate(-50%, -50%) rotate(var(--r0));
+  transition: transform var(--a-t) var(--a-spring) calc(var(--k) * var(--a-step)), opacity .15s ease; }
+.feat.is-play .art-sort .pile, .art-sort.is-held .pile { transform: translate(var(--x1), var(--y1)) translate(-50%, -50%); }
+.art-sort .pile .chip, .art-sort .ghost .chip { display: flex; }
+.art-sort:not(.is-compact) .pile:hover .chip { border-color: var(--a-acc); }
+.art-sort .pile.is-ghosted { opacity: 0; }
+.art-sort.is-dragging, .art-sort.is-dragging .pile { cursor: grabbing; }
+.art-sort .ghost { position: absolute; left: 0; top: 0; z-index: 30; pointer-events: none; }
+.art-sort .ghost.is-dropping { transition: transform .5s var(--a-spring); }
+.art-sort .ghost-lift { transform: translate(-50%, -50%) rotate(-3deg) scale(1.06); transition: transform .3s var(--a-spring); }
+.art-sort .ghost-lift .chip { border-color: var(--a-acc); }
+.art-sort .ghost.is-dropping .ghost-lift { transform: translate(-50%, -50%); }
+
+/* the phone drawing (rule 1): a column of files, a column of commits; two sets
+   of wires cross-fade (pile, tidy) so nothing depends on animating a path */
+.art-sort.is-compact .pile { cursor: default; touch-action: auto; }
+.art-sort.is-compact .wire-line { transition: opacity var(--a-c) ease; }
+.art-sort.is-compact .w-tidy { opacity: 0; }
+.feat.is-play .art-sort.is-compact .w-pile { opacity: 0; }
+.feat.is-play .art-sort.is-compact .w-tidy { opacity: 1; transition: opacity var(--a-t) ease calc(.3s + var(--k) * var(--a-step)); }
+
+/* ───────── 2. Write ───────── */
+.art-write .diff { left: 24px; top: 24px; width: 340px; height: 140px; overflow: hidden; }
+.art-write .fmark { box-sizing: border-box; width: 6px; height: 6px; border-radius: 1.5px; border: 1px solid var(--a-ink2); background: var(--a-ink2); }
+.art-write .diff-body { position: relative; padding: 6px 0; line-height: 19px; color: var(--a-text2); }
+.art-write .ln { display: flex; white-space: pre; }
+.art-write .no { flex: none; width: 28px; text-align: right; color: var(--a-mute); }
+.art-write .sg { flex: none; width: 22px; text-align: center; }
+.art-write .ln.add { color: var(--a-key); background: var(--a-tint); }
+.art-write .ln.del { color: var(--a-mute); background: var(--a-fill); }
+.art-write .ln.del .code { text-decoration: line-through; text-decoration-color: var(--a-mute); }
+.art-write .scan { position: absolute; left: 0; right: 0; top: 6px; height: 19px; opacity: 0; pointer-events: none; background: color-mix(in srgb, var(--a-acc) 18%, transparent); box-shadow: inset 2px 0 0 var(--a-acc); }
+.feat.is-play .art-write .scan { animation: write-scan .9s steps(5, jump-none) both; }
+@keyframes write-scan { 0% { transform: none; opacity: 1; } 99% { transform: translateY(76px); opacity: 1; } 100% { transform: translateY(76px); opacity: 0; } }
+.art-write .msg { left: 24px; top: 182px; width: 340px; height: 64px; display: flex; align-items: center; gap: 10px; padding: 0 14px; }
+.art-write .msg-main { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.art-write .msg-cap { display: flex; align-items: center; gap: 6px; color: var(--a-mute); }
+.art-write.is-typing .msg-cap .cdot { animation: write-think .6s ease-in-out infinite alternate; }
+@keyframes write-think { to { transform: scale(.7); } }
+.art-write .msg-text { display: flex; align-items: center; height: 18px; font-weight: 600; color: var(--a-key); white-space: pre; }
+.art-write .caret { width: 1.5px; height: 15px; margin-left: 1.5px; background: var(--a-acc); }
+.feat.is-play .art-write:not(.is-typing) .caret { animation: write-caret 1s steps(1) .3s infinite; }
+@keyframes write-caret { 50% { opacity: 0; } }
+/* the tag sits on the panel's top edge, like a label on a folder */
+.art-write .msg .chip { position: absolute; right: 12px; top: -13px; }
+
+/* ───────── 3. Cart ───────── */
+.art-cart .cart { left: 24px; top: 97px; width: 340px; height: 149px; }
+.art-cart .cart-icon { position: static; flex: none; }
+.art-cart .cart-icon :is(path, circle) { stroke: var(--a-text2); }
+.art-cart .cbadge { overflow: hidden; }
+.art-cart .roll { display: block; transition: transform var(--a-t) var(--a-spring) .3s; }
+.art-cart .roll i { display: block; height: 18px; }
+.feat.is-play .art-cart .roll { transform: translateY(-18px); }
+.art-cart .branch { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; color: var(--a-mute); }
+.art-cart .branch .rdot { border-color: var(--a-ink2); }
+.art-cart .rows { display: grid; gap: 4px; padding: 6px; }
+.art-cart .landing { box-sizing: border-box; height: 32px; border-radius: 8px; border: 1px dashed var(--a-ink); background: var(--a-paper); }
+.art-cart .incoming { position: absolute; left: 31px; top: 135px; width: 326px; height: 32px; z-index: 3;
+  transform: translate(8px, -103.5px) rotate(-3deg); transition: transform var(--a-t) var(--a-spring); }
+.feat.is-play .art-cart .incoming { transform: none; }
+
+/* ───────── 4. Hold ───────── */
+.art-hold .route { position: absolute; left: 48px; right: 48px; top: 24px; height: 24px; display: flex; align-items: center; gap: 10px; }
+.art-hold .ok { position: static; width: 0; opacity: 0; margin-left: -6px; transition: width var(--a-c) ease, opacity var(--a-c) ease, margin var(--a-c) ease; }
+.art-hold .ok path { stroke: var(--a-acc); stroke-width: 1.5; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset var(--a-c) ease; }
+.art-hold .track { position: relative; flex: 1; height: 24px; }
+.art-hold .rail { position: absolute; left: 0; right: 2px; top: 11.5px; height: 1px; background: var(--a-ink2); }
+.art-hold .rail::after { content: ""; position: absolute; right: -1px; top: -3px; width: 6px; height: 6px; border: solid var(--a-ink2); border-width: 1px 1px 0 0; transform: rotate(45deg); }
+.art-hold .c { box-sizing: border-box; position: absolute; left: calc(6px + var(--n) * 15px); top: 7.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--a-fill2); border: 1px solid var(--a-ink);
+  transition: transform .4s var(--a-ease), background-color var(--a-c) ease; }
+.art-hold .conn .up { stroke: var(--a-line); stroke-dasharray: 3 3; }
+.art-hold .hbtn { left: 48px; top: 110px; width: 292px; height: 56px; overflow: hidden; isolation: isolate; transition: transform .3s var(--a-spring), border-color var(--a-c) ease; }
+.art-hold .fill { box-sizing: border-box; position: absolute; left: 0; top: 0; bottom: 0; width: 30%; z-index: -1; background: var(--a-acc); transition: width .45s var(--a-ease); }
+.art-hold .lbl { position: absolute; inset: 0; overflow: hidden; font-weight: 600; color: var(--a-key); text-align: center; transition: color var(--a-c) ease; }
+.art-hold .lbl span { display: block; height: 54px; line-height: 54px; transition: transform var(--a-t) var(--a-spring); }
+.art-hold .secs { position: absolute; right: 14px; top: 20px; height: 14px; overflow: hidden; color: var(--a-mute); text-align: right; transition: color var(--a-c) ease; }
+.art-hold .secs span { display: block; transition: transform var(--a-t) var(--a-spring); }
+.art-hold .cursor { left: 300px; top: 152px; z-index: 4; transition: transform .4s var(--a-ease); }
+.art-hold .cursor path { fill: var(--a-fill); stroke: var(--a-text2); }
+.art-hold .ruler { position: absolute; left: 48px; top: 214px; width: 292px; height: 1px; background: var(--a-ink); }
+.art-hold .tick { position: absolute; top: 0; width: 1px; height: 6px; margin-left: -.5px; background: var(--a-ink); }
+.art-hold .tick:nth-of-type(2) { margin-left: 0; } .art-hold .tick:last-child { margin-left: -1px; }
+.art-hold .done { position: absolute; left: 0; top: -.25px; width: 30%; height: 1.5px; background: var(--a-acc); transition: width .45s var(--a-ease); }
+.art-hold .cap { position: absolute; left: 48px; right: 48px; top: 232px; display: flex; justify-content: space-between; color: var(--a-mute); }
+.art-hold .ring { box-sizing: border-box; position: absolute; left: 48px; top: 110px; width: 292px; height: 56px; border-radius: 12px; border: 1px solid var(--a-acc); opacity: 0; pointer-events: none; }
+/* the story: press (0 to .25s), fill (.25 to 1.65s: the real 1.4s), pushed.
+   The label and the seconds turn to --a-on as the green passes under them. */
+.feat.is-play .art-hold .cursor { transform: translate(-34px, -12px) scale(.94); }
+.feat.is-play .art-hold .hbtn { transform: scale(.98); border-color: var(--a-acc); transition: transform .3s var(--a-spring) .18s, border-color var(--a-c) ease 1.65s; }
+.feat.is-play .art-hold :is(.fill, .done) { width: 100%; transition: width 1.4s linear .25s; }
+.feat.is-play .art-hold .lbl { color: var(--a-on); transition: color .3s linear .7s; }
+.feat.is-play .art-hold .secs { color: var(--a-on); transition: color var(--a-c) linear 1.4s; }
+.feat.is-play .art-hold .lbl span { transform: translateY(-54px); transition-delay: 1.65s; }
+.feat.is-play .art-hold .secs span { transform: translateY(-14px); transition-delay: 1.65s; }
+.feat.is-play .art-hold .c { transform: translateX(54px); background: var(--a-ink2); transition: transform var(--a-t) var(--a-spring) calc(1.68s + (2 - var(--n)) * var(--a-step)), background-color var(--a-c) ease calc(1.78s + (2 - var(--n)) * var(--a-step)); }
+.feat.is-play .art-hold .ok { width: 12px; opacity: 1; margin-left: 0; transition-delay: 2s; }
+.feat.is-play .art-hold .ok path { stroke-dashoffset: 0; transition: stroke-dashoffset var(--a-c) ease 2.1s; }
+.feat.is-play .art-hold .ring { animation: hold-ring .7s var(--a-ease) 1.65s both; }
+@keyframes hold-ring { 0% { opacity: .9; transform: none; } 100% { opacity: 0; transform: scale(1.1, 1.4); } }
+
+/* ───────── 5. Receipt ───────── */
+.art-receipt .printer { left: 54px; top: 196px; width: 280px; height: 50px; background: var(--a-fill); }
+.art-receipt .slot { box-sizing: border-box; position: absolute; left: 19px; right: 19px; top: 10px; height: 7px; border-radius: 3.5px; border: 1.5px solid var(--a-acc); background: var(--a-tint); }
+.art-receipt .plate { position: absolute; left: 20px; bottom: 8px; color: var(--a-mute); }
+.art-receipt .p-led { box-sizing: border-box; position: absolute; right: 20px; bottom: 12px; width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--a-acc); background: var(--a-lime); }
+.art-receipt .out { position: absolute; left: 84px; top: -60px; width: 220px; height: 271.5px; overflow: hidden; z-index: 2; pointer-events: none; }
+.art-receipt .paper { box-sizing: border-box; position: absolute; left: 10px; top: 89.5px; width: 200px; min-height: 250px; padding: 9px 14px 0; line-height: 18px; color: var(--a-text2); background: var(--a-paper); border: solid var(--a-ink); border-width: 0 1px;
+  transition: transform .5s var(--a-ease); }
+.art-receipt .tear { left: -1px; top: -5px; }
+.art-receipt .tear path { fill: var(--a-paper); stroke: var(--a-ink); stroke-linejoin: miter; }
+.feat.is-play .art-receipt .paper { transform: translateY(-30px); transition: transform 1s steps(8, end) .1s; }
+.art-receipt .p-brand { display: flex; align-items: center; justify-content: center; gap: 4px; color: var(--a-text); font: 600 13px/18px var(--font-akt), sans-serif; letter-spacing: -.03em; }
+.art-receipt .p-brand svg { position: static; }
+.art-receipt .p-brand svg path { stroke: var(--a-text); fill: none; }
+.art-receipt .p-no { margin-top: 2px; line-height: 14px; text-align: center; color: var(--a-mute); }
+.art-receipt hr { border: 0; border-top: 1px dashed var(--a-line); margin: 8px 0; }
+.art-receipt .p-row { display: flex; justify-content: space-between; color: var(--a-text2); }
+.art-receipt .p-total { margin: -2px -7px; padding: 2px 7px; border-radius: 5px; background: var(--a-tint); color: var(--a-key); font-weight: 600; }
+.art-receipt .p-bars { display: flex; justify-content: center; gap: 1.5px; height: 18px; margin-top: 10px; }
+.art-receipt .p-bars i { background: var(--a-ink2); }
+.art-receipt .p-thanks { margin-top: 8px; line-height: 14px; text-align: center; color: var(--a-mute); }
+.feat.is-play .art-receipt .p-led { animation: receipt-led .22s steps(1) 5; }
+@keyframes receipt-led { 50% { background: var(--a-paper); } }
+
+/* ───────── 6. Undo ───────── */
+.art-undo .changes { left: 24px; top: 117px; width: 176px; height: 129px; }
+.art-undo .ch-row { display: flex; align-items: center; height: 32px; padding: 0 8px; }
+.art-undo .ch-row + .ch-row { border-top: 1px solid var(--a-line); }
+.art-undo .ch-row .chip { border-color: var(--a-ink); background: var(--a-fill); color: var(--a-text2); }
+.art-undo .ch-row.is-home { background: var(--a-tint); }
+.art-undo .ch-back { margin-left: auto; color: var(--a-text2); }
+.art-undo .back { position: absolute; left: 0; top: 0; z-index: 4; offset-distance: 100%; offset-rotate: 0deg; }
+.art-undo .back .chip { display: flex; }
+.art-undo .arc { stroke: var(--a-acc); stroke-width: 1.5; stroke-dasharray: 1; }
+.art-undo .arc-head { stroke: var(--a-acc); stroke-width: 1.5; }
+.art-undo .bin-rim { stroke: var(--a-ink); fill: var(--a-fill2); }
+.art-undo .bin-body { stroke: var(--a-ink); fill: var(--a-fill); }
+.art-undo .bin-ribs { stroke: var(--a-ink); }
+.art-undo .lid { transform-box: fill-box; transform-origin: 100% 100%; transform: rotate(44deg); transition: transform var(--a-t) var(--a-spring); }
+.art-undo .lid-top { fill: var(--a-fill2); stroke: var(--a-ink); }
+.art-undo .lid-knob { fill: var(--a-fill2); stroke: var(--a-ink); }
+.art-undo .key { position: absolute; left: 178px; top: 24px; z-index: 3; gap: 2px; font-weight: 500; }
+.feat.is-play .art-undo .key { animation: undo-key .4s ease-out; }
+@keyframes undo-key { 25%, 55% { transform: translateY(2px); background: var(--a-tint); } }
+.feat.is-play .art-undo .lid { animation: undo-lid 1.2s var(--a-ease); }
+@keyframes undo-lid { 0%, 12% { transform: none; } 20% { transform: translate(0, 1px); } 50%, 100% { transform: rotate(44deg); } }
+.feat.is-play .art-undo .back { animation: undo-out 1s cubic-bezier(.3, .7, .2, 1) .3s backwards; }
+@keyframes undo-out { 0% { offset-distance: 0%; opacity: 0; scale: .6; } 12% { opacity: 1; } 70% { scale: 1.04; } 100% { offset-distance: 100%; scale: 1; } }
+.feat.is-play .art-undo .arc { animation: undo-arc .9s cubic-bezier(.3, .7, .2, 1) .3s backwards; }
+@keyframes undo-arc { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.feat.is-play .art-undo .arc-head { animation: undo-pop var(--a-c) ease 1.1s backwards; }
+.feat.is-play .art-undo .ch-back { animation: undo-pop var(--a-c) ease 1.3s backwards; }
+@keyframes undo-pop { from { opacity: 0; } }
+
+/* ───────── 7. History ───────── */
+.art-history .weeks { position: absolute; inset: 0; }
+.art-history .base { position: absolute; left: 24px; top: 226px; width: 348px; height: 1px; background: var(--a-ink2); }
+.art-history .rule { position: absolute; left: 24px; width: 348px; height: 0; border-top: 1px dashed var(--a-line); }
+.art-history .r1 { top: 174px; } .art-history .r2 { top: 122px; }
+.art-history .wk { position: absolute; bottom: 47px; width: 16px; height: 120px; }
+.art-history .wk i { box-sizing: border-box; position: absolute; left: 0; width: 16px; height: 10px; border-radius: 3px; border: 1px solid var(--a-ink); background: var(--a-fill2); }
+.art-history .wk-now i { border: 1px solid var(--a-acc); background: var(--a-acc); }
+.art-history .wk-now i:last-child { background: var(--a-lime); }
+.feat.is-play .art-history .wk i { animation: hist-block .5s var(--a-spring) calc(var(--w) * var(--a-step) + var(--b) * 30ms) backwards; }
+@keyframes hist-block { from { transform: translateY(-14px) scale(.6); opacity: 0; } }
+.art-history .ax { position: absolute; top: 234px; line-height: 12px; color: var(--a-mute); }
+/* the count is a two-line row */
+.art-history .wtip { box-sizing: border-box; position: absolute; left: 268px; top: 24px; width: 104px; height: 46px; padding: 5px 10px; border: 1px solid var(--a-ink); border-radius: 8px; background: var(--a-paper); display: grid; }
+.art-history .wtip .mono { color: var(--a-mute); }
+.art-history .tip-stem { position: absolute; left: 352px; top: 70px; width: 1px; height: 36px; background: var(--a-ink); }
+.feat.is-play .art-history :is(.wtip, .tip-stem) { animation: hist-tip var(--a-t) var(--a-spring) .7s backwards; }
+@keyframes hist-tip { from { transform: translateY(8px) scale(.94); opacity: 0; } }
+.art-history .divide { position: absolute; left: 400px; top: 24px; width: 0; height: 222px; border-left: 1px dashed var(--a-line); }
+
+.art-history .lane-main { stroke: var(--a-ink2); stroke-dasharray: 1; }
+.art-history .lane-fix { stroke: var(--a-ink2); stroke-dasharray: 3 3; }
+.art-history .lane-feat { stroke: var(--a-acc); stroke-width: 1.5; stroke-dasharray: 1; }
+.art-history .feat-stem { stroke: var(--a-acc); }
+.art-history .tag-stem { stroke: var(--a-ink); }
+.art-history .node circle { fill: var(--a-paper); stroke: var(--a-ink2); }
+.art-history .node.f circle { fill: var(--a-tint); stroke: var(--a-acc); stroke-width: 1.5; }
+.art-history .node.x circle { stroke: var(--a-ink); }
+.art-history .node.merge .pip { fill: var(--a-ink2); stroke: none; }
+.art-history .node.head circle { fill: var(--a-ink2); }
+.art-history .br, .art-history .tag { position: absolute; }
+.art-history .br-main { left: 430px; top: 150px; }
+.art-history .br-feat { left: 567.5px; top: 24px; }
+.art-history .br-open { position: absolute; left: 690px; top: 234px; line-height: 12px; color: var(--a-mute); }
+.art-history .tag { right: 24px; top: 108px; }
+.feat.is-play .art-history :is(.lane-main, .lane-feat) { animation: hist-draw 1s var(--a-ease) backwards; }
+.feat.is-play .art-history .lane-feat { animation-delay: .2s; }
+.feat.is-play .art-history .lane-fix { animation: undo-pop var(--a-t) ease .5s backwards; }
+@keyframes hist-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.feat.is-play .art-history .node { animation: hist-node .5s var(--a-spring) calc(.15s + var(--n) * 2 * var(--a-step)) backwards; }
+@keyframes hist-node { from { transform: scale(0); } }
+.feat.is-play .art-history :is(.tag, .tag-stem) { animation: hist-tip var(--a-t) var(--a-spring) 1s backwards; }
+.feat.is-play .art-history :is(.br, .feat-stem, .br-open) { animation: undo-pop var(--a-c) ease .1s backwards; }
+
+/* the phone drawing (rule 1): lanes on top, weeks under them */
+.art-history.is-compact .base { width: 340px; }
+.art-history.is-compact :is(.rule, .divide, .tip-stem) { display: none; }
+.art-history.is-compact .wk { bottom: 46px; height: 72px; }
+.art-history.is-compact .wk i { height: 6px; border-radius: 2px; }
+.art-history.is-compact .wtip { left: auto; right: 24px; top: 130px; width: auto; height: 14px; padding: 0; border: 0; border-radius: 0; background: none; display: flex; gap: 6px; }
+.art-history.is-compact .wtip b { font: 500 11px/14px var(--font-mono), ui-monospace, monospace; color: var(--a-key); }
+.art-history.is-compact .br-main { left: 24px; top: 94px; }
+.art-history.is-compact .br-feat { left: 141px; top: 24px; }
+.art-history.is-compact .tag { top: 24px; }
+
+/* Idle life: after 20s without input, Features sets data-idle to one card at a
+   time and that drawing breathes once. Any input removes it at once. */
+.bento[data-idle="sort"] .art-sort .wire-pulse { animation: sort-pulse 1.6s cubic-bezier(.5, 0, .3, 1) calc(var(--k) * .12s) both; }
+.bento[data-idle="cart"] .art-cart .incoming { animation: idle-bob 3.6s ease-in-out; }
+.bento[data-idle="history"] .art-history .wk-now i { animation: idle-lit 1.2s ease-in-out calc(var(--b) * 90ms); }
+.bento[data-idle="receipt"] .art-receipt .paper { animation: idle-feed 3.6s; }
+@keyframes idle-bob { 50% { transform: translate(8px, -97px) rotate(-1.5deg); } }
+@keyframes idle-lit { 50% { transform: scale(1.18); } }
+@keyframes idle-feed {
+  0% { transform: none; animation-timing-function: steps(2); }
+  30%, 70% { transform: translateY(-6px); animation-timing-function: cubic-bezier(.23, 1, .32, 1); }
+  100% { transform: none; }
+}
+
+/* small screens: one column; each art area keeps its stage's proportions */
+@media (max-width: 899px) {
+  .bento { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
+  .bento .feat, .bento .feat.wide { grid-column: auto; }
+  .feat-art { flex: none; min-height: 0; aspect-ratio: 388 / 286; max-height: 300px; }
+  .feat.wide .feat-art { aspect-ratio: 794 / 290; }
+}
+/* phones: the wide cards swap to their 388 drawing */
+@media (max-width: 599px) {
+  .feat.wide .feat-art { aspect-ratio: 388 / 286; }
+  .stage.is-wide { display: none; }
+  .stage.is-phone { display: block; }
+}
+/* a tap replay snaps back to rest first (features.jsx) */
+.bento .feat.is-rewind * { transition: none !important; animation: none !important; }
+
+/* reduced motion: hover shows each end state at once; nothing moves */
+@media (prefers-reduced-motion: reduce) {
+  .bento, .bento .feat, .bento .feat *, .bento .feat::after, .bento .feat-art::after { transition: none !important; animation: none !important; }
+}
