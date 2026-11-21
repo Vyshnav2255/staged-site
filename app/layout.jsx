@@ -3,6 +3,7 @@ import './globals.css';
 import './delight.css';
 import './receipt.css';
 import { asset } from '@/lib/site';
+import Analytics from '@/components/analytics';
 
 const akt = localFont({ src: './Akt-Variable.woff2', weight: '100 900', variable: '--font-akt', display: 'swap' });
 const mono = localFont({ src: './GeistMono-Variable.woff2', weight: '100 900', variable: '--font-mono', display: 'swap' });
@@ -22,7 +23,10 @@ export const viewport = { colorScheme: 'light', themeColor: '#f3f2ee' };
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${akt.variable} ${mono.variable}`}>
-      <body>{children}</body>
+      <head>
+        <script defer src="https://cloud.umami.is/script.js" data-website-id="b1106dd2-f33f-4ede-bfdd-59fb6b5d8cdc"></script>
+      </head>
+      <body>{children}<Analytics /></body>
     </html>
   );
 }

@@ -2,6 +2,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { LazyMotion, domMax, m, MotionConfig } from 'motion/react';
 import { sfxFold, sfxTick, sfxGrouped } from '@/lib/sfx';
+import { track } from '@/lib/track';
 
 // Plus that morphs to a minus: the vertical bar folds away while the icon turns.
 const Plus = () => (
@@ -45,8 +46,9 @@ export default function FaqList({ items, kicker, groups = {} }) {
   };
   // Sound goes with the click, so swapping one open answer for another only ticks once.
   const click = (i, special) => (e) => {
-    if (e.currentTarget.parentElement.open) sfxFold();
-    else if (special) sfxGrouped(2);
+    if (e.currentTarget.parentElement.open) return sfxFold();
+    track('faq-open', { q: e.currentTarget.textContent.replace(/new$/, '').trim().slice(0, 80) });
+    if (special) sfxGrouped(2);
     else sfxTick(i);
   };
   return (

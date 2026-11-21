@@ -1,54 +1,35 @@
-import { Badge, FileChip } from './parts';
-
-// Undo: a discarded file comes back out of the grey trash, over an arc (the green
-// accent), into the top row of the changes list, which is tinted green for it.
-// Rest shows it restored; hover plays the trip again.
-
-// The file's path: out of the bin's mouth, over the top, down into the first row.
-const P = [[292, 137], [284, -4], [112, -4], [74.5, 165]];
-const ARC = `M${P[0]}C${P[1]} ${P[2]} ${P[3]}`;
-// The drawn arc stops short of the list (de Casteljau at t), with an arrowhead there.
-const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
-const T = 0.87;
-const q = [lerp(P[0], P[1], T), lerp(P[1], P[2], T), lerp(P[2], P[3], T)];
-const r = [lerp(q[0], q[1], T), lerp(q[1], q[2], T)];
-const tip = lerp(r[0], r[1], T);
-const fx = (pt) => pt.map((v) => +v.toFixed(1));
-const DRAWN = `M${P[0]}C${fx(q[0])} ${fx(r[0])} ${fx(tip)}`;
-const ang = Math.atan2(tip[1] - r[0][1], tip[0] - r[0][0]);
-const wing = (d) => fx([tip[0] - 6 * Math.cos(ang + d), tip[1] - 6 * Math.sin(ang + d)]);
-const HEAD = `M${wing(0.6)}L${fx(tip)}L${wing(-0.6)}`;
+// Undo by default: a file back in its slot in the row, the dashed outline it
+// left in the trash (two more still in there), and the Restore arc between.
+const lines = (x, y) => `M${x + 11} ${y + 17}h16M${x + 11} ${y + 27}h24M${x + 11} ${y + 37}h12`;
 
 export default function UndoArt() {
   return (
-    <div className="art art-undo" aria-hidden="true">
-      <div className="changes panel">
-        <div className="panel-head"><b>Changes</b><Badge>3</Badge></div>
-        <div className="ch-row is-home"><span className="ch-back mono">restored</span></div>
-        <div className="ch-row"><FileChip name="cart.js" /></div>
-        <div className="ch-row"><FileChip name="guide.md" /></div>
-      </div>
-
-      <svg className="lines" viewBox="0 0 388 270" width="388" height="270">
-        <path className="arc" d={DRAWN} pathLength="1" />
-        <path className="arc-head" d={HEAD} />
-        {/* the bin: back rim, body, ribs, lid */}
-        <g transform="translate(20 5.500)">
-          <ellipse className="bin-rim" cx="286" cy="132" rx="46" ry="7" />
-          <path className="bin-body" d="M240 132c0 3.900 20.600 7 46 7s46-3.100 46-7l-7.200 96.500c-.5 6.400-5.800 11.500-12.300 11.500h-53c-6.500 0-11.800-5.100-12.300-11.500Z" />
-          <path className="bin-ribs" d="M268 154l2.500 70M286 155v70M304 154l-2.500 70" />
-          <g className="lid">
-            <path className="lid-top" d="M236 121.500c0-2.500 2-4.500 4.500-4.500h91c2.500 0 4.500 2 4.500 4.500v3c0 1.400-1.100 2.500-2.500 2.500h-95c-1.400 0-2.500-1.100-2.500-2.500Z" />
-            <path className="lid-knob" d="M276 117v-3.500c0-1.700 1.300-3 3-3h14c1.700 0 3 1.300 3 3V117" />
-          </g>
-        </g>
-      </svg>
-
-      <span className="chip key"><span>⌘</span>Z</span>
-
-      <div className="back" style={{ offsetPath: `path('${ARC}')` }}>
-        <FileChip name="notes.md" tone={0} className="is-acc" />
-      </div>
-    </div>
+    <svg className="art art-undo" viewBox="0 0 400 200" aria-hidden="true">
+      <rect className="fill" x="66" y="96" width="46" height="56" rx="9" />
+      <path className="ln" d={lines(66, 96)} />
+      <rect className="paper" x="182" y="96" width="46" height="56" rx="9" />
+      <path className="ln" d={lines(182, 96)} />
+      <rect className="slot" x="118" y="90" width="58" height="68" rx="14" />
+      <g transform="rotate(8 316 68)">
+        <rect className="dash" x="293" y="40" width="46" height="56" rx="9" />
+        <path className="dash" d={lines(293, 40)} />
+      </g>
+      <path className="paper" d="M292 90h48l-4 55a8 8 0 0 1-8 7h-24a8 8 0 0 1-8-7z" />
+      <path d="M285 90h62" />
+      <path d="M308 90v-4a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v4" />
+      <path className="ln" d="M306 104v34M316 104v34M326 104v34" />
+      <circle className="paper" cx="340" cy="146" r="9" />
+      <text x="340" y="150" textAnchor="middle">3</text>
+      <g className="back">
+        <rect className="tint" x="124" y="96" width="46" height="56" rx="9" />
+        <path className="ln on" d={lines(124, 96)} />
+      </g>
+      <path className="acc arc" d="M304 32C278 2 180 16 153 80" pathLength="1" />
+      <path className="acc" d="M160.6 75.2L153 80L151.1 71.2" />
+      <rect className="paper" x="196" y="9" width="66" height="22" rx="11" />
+      <text x="229" y="24" textAnchor="middle">Restore</text>
+      <text x="147" y="174" textAnchor="middle">label.css</text>
+      <text className="akt" x="316" y="174" textAnchor="middle">Trash</text>
+    </svg>
   );
 }

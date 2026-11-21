@@ -1,80 +1,32 @@
-// History you can read. Left: twelve weeks of shipped commits as stacks of grey
-// blocks, this week in solid green, with its count. Right: the branch tree as
-// lanes: a feature branch (green, with a solid green label) that merges, a fix
-// still open, a tag on the newest commit.
-// On hover the stacks build up, the lanes draw and the nodes land in order.
-// `compact` is the phone drawing on the 388 board: the lanes on top, the weeks
-// under them (shorter blocks, no open fix).
+// History you can read: one lane of commits over three weeks, a feature branch
+// that leaves and merges back, a short fix lane, a tag on the latest commit
+// (HEAD), and a strip of commits per day under the dates.
+const DAYS = [3, 6, 9, 4, 7, 2, 0, 5, 10, 13, 8, 11, 3, 2, 6, 9, 12, 7, 0, 0, 0];
 
-const WEEKS = [2, 4, 2, 5, 3, 6, 4, 3, 6, 5, 7, 9];
-const X0 = 36, STEP = 28;
-
-const WIDE = {
-  bh: 10, bg: 3,
-  main: 'M486 162H735',
-  feat: 'M549 162C575 162 573 84 599 84H648C674 84 672 162 698 162',
-  fix: 'M622 162C637 162 635 241 650 241H673',
-  featStem: 'M625.500 48V79', tagStem: 'M741 132V156',
-  nodes: [
-    { x: 510, y: 162, k: 'm' }, { x: 549, y: 162, k: 'm' },
-    { x: 603, y: 84, k: 'f' }, { x: 625.500, y: 84, k: 'f' }, { x: 648, y: 84, k: 'f' },
-    { x: 622, y: 162, k: 'm' }, { x: 652, y: 241, k: 'x' }, { x: 678, y: 241, k: 'x open' },
-    { x: 698, y: 162, k: 'm merge' }, { x: 741, y: 162, k: 'head' },
-  ],
-};
-const COMPACT = {
-  bh: 6, bg: 2,
-  main: 'M80 106H334',
-  feat: 'M122 106C144 106 142 66 164 66H232C254 66 252 106 274 106',
-  featStem: 'M198 48V61', tagStem: 'M340 48V100',
-  nodes: [
-    { x: 100, y: 106, k: 'm' }, { x: 122, y: 106, k: 'm' },
-    { x: 170, y: 66, k: 'f' }, { x: 198, y: 66, k: 'f' }, { x: 226, y: 66, k: 'f' },
-    { x: 198, y: 106, k: 'm' }, { x: 274, y: 106, k: 'm merge' }, { x: 340, y: 106, k: 'head' },
-  ],
-};
-
-export default function HistoryArt({ compact = false }) {
-  const g = compact ? COMPACT : WIDE;
-  const now = WEEKS[WEEKS.length - 1];
+export default function HistoryArt() {
   return (
-    <div className={`art art-history${compact ? ' is-compact' : ''}`} aria-hidden="true">
-      <div className="weeks">
-        <i className="rule r1" /><i className="rule r2" /><i className="base" />
-        {WEEKS.map((count, w) => (
-          <span key={w} className={`wk${w === WEEKS.length - 1 ? ' wk-now' : ''}`} style={{ left: X0 + w * STEP, '--w': w }}>
-            {Array.from({ length: count }, (_, b) => <i key={b} style={{ bottom: b * (g.bh + g.bg), '--b': b }} />)}
-          </span>
-        ))}
-        <span className="ax mono" style={{ left: X0 }}>Sep</span>
-        <span className="ax mono" style={{ left: X0 + 4 * STEP }}>Oct</span>
-        <span className="ax mono" style={{ left: X0 + 8 * STEP }}>Nov</span>
-        <div className="wtip">
-          <span className="mono">this week</span>
-          <b>{now} commits</b>
-        </div>
-        <i className="tip-stem" />
-      </div>
-
-      <i className="divide" />
-
-      <svg className="tree" viewBox={compact ? '0 0 388 270' : '0 0 794 270'} width={compact ? 388 : 794} height="270">
-        <path className="lane lane-main" d={g.main} pathLength="1" />
-        {g.fix && <path className="lane lane-fix" d={g.fix} />}
-        <path className="lane lane-feat" d={g.feat} pathLength="1" />
-        <path className="stem feat-stem" d={g.featStem} />
-        <path className="stem tag-stem" d={g.tagStem} />
-        {g.nodes.map((nd, i) => (
-          <g key={i} className={`node ${nd.k}`} style={{ '--n': i, transformOrigin: `${nd.x}px ${nd.y}px` }}>
-            <circle cx={nd.x} cy={nd.y} r={nd.k === 'head' ? 5.5 : 4.5} />
-            {nd.k.includes('merge') && <circle className="pip" cx={nd.x} cy={nd.y} r="1.75" />}
-          </g>
-        ))}
-      </svg>
-      <span className="chip br br-main"><i className="rdot" />main</span>
-      <span className="chip br br-feat is-on"><i className="rdot" />label-printer</span>
-      {g.fix && <span className="br-open mono">fix/sidebar</span>}
-      <span className="chip tag">v0.2.0</span>
-    </div>
+    <svg className="art art-history" viewBox="0 0 400 200" aria-hidden="true">
+      <text x="200" y="20" textAnchor="middle">label-printer</text>
+      <path d="M26 90H374" />
+      <path d="M60 90C78 90 74 112 92 112S106 90 124 90" />
+      <path className="acc branch" d="M124 90C160 90 146 38 182 38H218C254 38 240 90 276 90" pathLength="1" />
+      {[168, 200, 232, 308].map((x) => <circle key={x} className="dot" cx={x} cy="90" r="2.5" />)}
+      {[60, 124, 276].map((x) => <circle key={x} className="paper" cx={x} cy="90" r="6" />)}
+      <circle className="paper" cx="92" cy="112" r="4.5" />
+      <text className="dim xs" x="92" y="132" textAnchor="middle">fix/crash</text>
+      {[182, 218].map((x, n) => <circle key={x} className="tint bnode" cx={x} cy="38" r="6" style={{ '--n': n }} />)}
+      <path d="M340 84V72" />
+      <rect className="paper" x="313" y="50" width="54" height="22" rx="11" />
+      <text x="340" y="65" textAnchor="middle">v0.2.0</text>
+      <circle className="tint" cx="340" cy="90" r="6" />
+      <text className="plus" x="340" y="114" textAnchor="middle">HEAD</text>
+      <text className="akt" x="60" y="156" textAnchor="middle">Nov 2</text>
+      <text className="akt" x="200" y="156" textAnchor="middle">Nov 9</text>
+      <text className="akt" x="340" y="156" textAnchor="middle">Nov 16</text>
+      {DAYS.map((h, i) => {
+        const x = [60, 200, 340][Math.floor(i / 7)] - 23 + (i % 7) * 7;
+        return <rect key={i} className={i === 17 ? 'wk on' : 'wk'} x={x} y={190 - Math.max(h * 1.4, 2)} width="4" height={Math.max(h * 1.4, 2)} rx="1.5" />;
+      })}
+    </svg>
   );
 }

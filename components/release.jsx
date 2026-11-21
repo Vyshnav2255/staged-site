@@ -1,7 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { REPO, shapeRelease } from '@/lib/site';
-import { Spark } from './delight/spark';
 import { reducedMotion } from './delight/util';
 
 const Ctx = createContext(null);
@@ -10,7 +9,7 @@ const CACHE = 'staged-site-release';
 const SEEN = 'staged-site-seen-tag';
 
 // Starts from the release baked in at build time, then asks GitHub for the
-// latest one, so the badge and the copy command follow new releases.
+// latest one, so the copy command and the footer follow new releases.
 export function ReleaseProvider({ initial, children }) {
   const [release, setRelease] = useState(initial);
   const [live, setLive] = useState(false); // true once we know which release is really the latest
@@ -62,13 +61,11 @@ export function Version({ prefix = '' }) {
   return <span className={flash ? 'ver is-new' : 'ver'}>{prefix}{r.tag}</span>;
 }
 
-export function ReleaseBadge() {
+// A release you haven't seen before gets one small sparkle (on the copy button), then we remember it.
+export function useFreshRelease() {
   const r = useRelease();
   const live = useLive();
   const [burst, setBurst] = useState(false);
-  const when = ago(r.date);
-
-  // A release you haven't seen before gets one small sparkle, then we remember it.
   useEffect(() => {
     if (!live) return;
     let seen = null;
@@ -77,14 +74,8 @@ export function ReleaseBadge() {
     try { localStorage.setItem(SEEN, r.tag); } catch {}
     if (reducedMotion()) return;
     setBurst(true);
-    setTimeout(() => setBurst(false), 1500);
+    const t = setTimeout(() => setBurst(false), 1500);
+    return () => clearTimeout(t);
   }, [live, r.tag]);
-
-  return (
-    <a className="badge" href={r.url} rel="noopener">
-      <b><i className="pulse" aria-hidden="true" /><Version />{burst && <Spark />}</b>
-      <span className="badge-text">Latest release{when ? `, out ${when}` : ''}</span>
-      <span className="badge-arr" aria-hidden="true">→</span>
-    </a>
-  );
+  return burst;
 }

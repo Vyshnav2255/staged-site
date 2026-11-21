@@ -1,67 +1,33 @@
-'use client';
-import { useRef, useState } from 'react';
-import { useCardHover } from './parts';
-import { COMMITS } from './data';
-
-// A diff panel above (added lines tinted green, the removed one grey), the commit
-// message it turns into below (the green accent, with a solid green tag on its
-// corner). On hover a line reads down the diff, then the message is typed out
-// again, a character at a time.
-
-const LINES = [
-  ['', 13, "import { feed } from './paper'"],
-  ['+', 14, 'export function printLabel(job) {'],
-  ['+', 15, '  const paper = feed(job.size)'],
-  ['+', 16, '  return paper.print(job.label)'],
-  ['-', 17, '  // todo: labels'],
+// Writes the message: a small diff (file name, counts, three numbered lines
+// of code) becomes one message line with a cursor, in the repo's own style.
+const ROWS = [
+  ['12', '+', 'const label = makeLabel(order)', 'on'],
+  ['13', '+', 'printer.print(label)', 'on'],
+  ['14', '−', 'console.log(order)', ''],
 ];
-const TEXT = COMMITS[0].subject;
-const READ_MS = 900, KEY_MS = 30;
 
 export default function WriteArt() {
-  const root = useRef(null);
-  const [n, setN] = useState(TEXT.length);
-  const [typing, setTyping] = useState(false);
-
-  useCardHover(root, () => {
-    let t = 0, i = 0;
-    setN(0); setTyping(true);
-    const key = () => {
-      i += 1; setN(i);
-      if (i < TEXT.length) t = setTimeout(key, KEY_MS + (TEXT[i - 1] === ' ' ? 50 : 0));
-      else setTyping(false);
-    };
-    t = setTimeout(key, READ_MS);
-    return () => { clearTimeout(t); setN(TEXT.length); setTyping(false); };
-  });
-
   return (
-    <div ref={root} className={`art art-write${typing ? ' is-typing' : ''}`} aria-hidden="true">
-      <div className="diff panel">
-        <div className="panel-head">
-          <i className="fmark" />
-          <span className="mono">src/printer.js</span>
-          <span className="badge">+4 −1</span>
-        </div>
-        <div className="diff-body mono">
-          {LINES.map(([sign, no, code]) => (
-            <div key={no} className={`ln${sign === '+' ? ' add' : sign === '-' ? ' del' : ''}`}>
-              <span className="no">{no}</span><span className="sg">{sign === '-' ? '−' : sign}</span><span className="code">{code}</span>
-            </div>
-          ))}
-          <i className="scan" />
-        </div>
-      </div>
-      <svg className="conn" viewBox="0 0 388 270" width="388" height="270">
-        <path d="M194 164V180" /><path d="M190 176.500L194 180.500L198 176.500" />
-      </svg>
-      <div className="msg panel is-acc">
-        <div className="msg-main">
-          <span className="msg-cap mono"><i className="cdot" />commit message</span>
-          <span className="msg-text"><span>{TEXT.slice(0, n)}</span><i className="caret" /></span>
-        </div>
-        <span className="chip is-on">your style</span>
-      </div>
-    </div>
+    <svg className="art art-write" viewBox="0 0 400 200" aria-hidden="true">
+      <rect className="paper" x="60" y="6" width="280" height="94" rx="12" />
+      <text x="76" y="28">label.js</text>
+      <text x="324" y="28" textAnchor="end"><tspan className="plus">+12</tspan> −3</text>
+      <path className="ln" d="M60 40H340" />
+      {ROWS.map(([no, sign, code, on], n) => (
+        <g key={no}>
+          {on && <rect className="bar on" x="68" y={47 + n * 16} width="264" height="16" rx="4" style={{ '--n': n }} />}
+          <text className="dim xs" x="76" y={59 + n * 16}>{no}</text>
+          <text className={on ? 'plus' : 'dim'} x="98" y={59 + n * 16}>{sign}</text>
+          <text className={on ? undefined : 'dim'} x="112" y={59 + n * 16}>{code}</text>
+        </g>
+      ))}
+      <path d="M200 106v11m-4.5 -4.5l4.5 4.5l4.5 -4.5" />
+      <rect className="paper acc" x="60" y="124" width="280" height="46" rx="14" />
+      <rect className="paper" x="246" y="114" width="80" height="20" rx="10" />
+      <text x="286" y="128" textAnchor="middle">your style</text>
+      <rect className="hl" x="74" y="138" width="43" height="18" rx="5" />
+      <text x="80" y="151" textLength="165">feat: add a label printer</text>
+      <rect className="caret" x="251" y="138" width="2" height="18" rx="1" />
+    </svg>
   );
 }

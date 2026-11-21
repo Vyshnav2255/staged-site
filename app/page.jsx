@@ -1,6 +1,6 @@
 import { getLatestRelease } from '@/lib/release';
 import { GH, BMC_URL } from '@/lib/site';
-import { ReleaseProvider, ReleaseBadge, Version } from '@/components/release';
+import { ReleaseProvider, Version } from '@/components/release';
 import CopyCommand from '@/components/copy-command';
 import SoundToggle from '@/components/sound-toggle';
 import HoldToPush from '@/components/hold-to-push';
@@ -99,23 +99,15 @@ export default async function Page() {
 
       <main id="top">
         <div className="hero wrap">
-          <div className="badge-in"><ReleaseBadge /></div>
           <h1>
             <span className="h1-line"><span style={{ '--l': 0 }}>Commit your work.</span></span>
-            <span className="h1-line h1-last"><span style={{ '--l': 1 }}><em>Properly.<svg className="scribble" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true">
-              <defs><linearGradient id="scribble-g" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stopColor="#9ccb3f" /><stop offset=".38" stopColor="#3fae5f" /><stop offset=".78" stopColor="#1f9a6a" /><stop offset="1" stopColor="#14724d" /></linearGradient></defs>
-              <path className="s1" d="M4 13C70 5 150 3 296 8" pathLength="1" />
-              <path className="s2" d="M40 17C120 12 200 11 262 14" pathLength="1" />
-            </svg></em></span></span>
+            <span className="h1-line h1-last"><span style={{ '--l': 1 }}><em>Properly.</em></span></span>
           </h1>
           <p className="sub in" style={{ '--i': 4 }}>Staged sorts your uncommitted changes into clean commits and writes the messages. You check them, add them to the cart, and hold to push.</p>
           <div className="cta in" id="get" style={{ '--i': 5 }}>
             <CopyCommand>
               <span>Free, no account</span>
-              <span>Opens in your browser</span>
-              <span>macOS</span>
-              <span>Node 18+</span>
-              <a className="hero-gh" href={GH} rel="noopener">GitHub<span aria-hidden="true">→</span></a>
+              <span>macOS, Node 18+</span>
             </CopyCommand>
           </div>
           <div className="demo in" style={{ '--i': 6 }}>

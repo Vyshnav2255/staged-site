@@ -7,7 +7,18 @@ import { asset } from '@/lib/site';
 export function PageEffects() {
   useEffect(() => {
     const nav = document.getElementById('nav');
-    const onScroll = () => nav?.classList.toggle('is-stuck', scrollY > 8);
+    // The nav starts clear over the hero and fills in to the frosted pill as you scroll past it:
+    // --np runs 0 to 1 from the top of the page to where the demo meets the nav.
+    const demo = document.querySelector('.hero .demo');
+    let end = 600;
+    const measure = () => { end = Math.max(200, (demo ? demo.getBoundingClientRect().top + scrollY : 700) - 120); };
+    const onScroll = () => {
+      nav?.classList.toggle('is-stuck', scrollY > end);
+      nav?.style.setProperty('--np', String(Math.min(1, Math.max(0, scrollY / end)).toFixed(3)));
+    };
+    measure();
+    const onResize = () => { measure(); onScroll(); };
+    addEventListener('resize', onResize, { passive: true });
     addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
     // .reveal-group staggers its children (index into --i, capped), .reveal / .reveal-self move as one.
@@ -19,6 +30,11 @@ export function PageEffects() {
       for (const e of es) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
     }, { rootMargin: '0px 0px -12% 0px', threshold: 0.15 });
     document.querySelectorAll('.reveal, .reveal-self, .reveal-group').forEach((el) => io.observe(el));
+    // The footer wordmark sits at the very end of the page, where the -12% margin can never reach it (phones).
+    const atEnd = () => {
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) document.querySelectorAll('.reveal-self:not(.is-in), .reveal-group:not(.is-in)').forEach((el) => { if (el.getBoundingClientRect().top < innerHeight) el.classList.add('is-in'); });
+    };
+    addEventListener('scroll', atEnd, { passive: true });
 
     const glow = (e) => {
       const card = e.target.closest?.('.feat, .diff-card');
@@ -28,7 +44,7 @@ export function PageEffects() {
       card.style.setProperty('--my', `${e.clientY - r.top}px`);
     };
     addEventListener('pointermove', glow, { passive: true });
-    return () => { removeEventListener('scroll', onScroll); removeEventListener('pointermove', glow); io.disconnect(); };
+    return () => { removeEventListener('scroll', onScroll); removeEventListener('resize', onResize); removeEventListener('scroll', atEnd); removeEventListener('pointermove', glow); io.disconnect(); };
   }, []);
   return null;
 }

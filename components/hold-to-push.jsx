@@ -4,6 +4,7 @@ import { LazyMotion, domMax, m, AnimatePresence, MotionConfig } from 'motion/rea
 import { sfxTick, sfxApproved, sfxLaser, sfxBeeps, sfxStamp, sfxDrain, sfxDiscard, sfxClink, sfxUnclink, buzz } from '@/lib/sfx';
 import { useForcePush } from './delight/use-force-push';
 import { useTear } from './delight/use-tear';
+import { track } from '@/lib/track';
 import { PaperTip } from './delight/paper-tip';
 import { Smoke } from './delight/smoke';
 import { Odometer } from './delight/odometer';
@@ -111,7 +112,7 @@ export default function HoldToPush() {
   };
   const reset = () => { clearPaper(); setPhase('idle'); setP(0); root.current?.style.removeProperty('--print-h'); };
 
-  const { bind, tear } = useTear({ paperRef: paper, enabled: ready && !torn, onTorn: () => setTorn(true), onGone: reset });
+  const { bind, tear } = useTear({ paperRef: paper, enabled: ready && !torn, onTorn: () => { setTorn(true); track('receipt-tear'); }, onGone: reset });
   // Before the tear: the paper lifts a little toward a mouse (up to 1.2deg about the slot).
   // On touch it only tears from the strip along its bottom edge, so the page still scrolls.
   const tilt = (deg) => paper.current?.querySelector('.receipt')?.style.setProperty('--tilt', `${deg.toFixed(2)}deg`);
@@ -161,10 +162,12 @@ export default function HoldToPush() {
     if (phase !== 'holding') return;
     cancelAnimationFrame(raf.current);
     setPhase('early'); setP(0); sfxDrain();
+    track('push-early-release');
     setEarly((k) => k + 1);
   };
   const done = () => {
     setPhase('pushing'); sfxApproved(); buzz([12, 40, 24]);
+    track('push-complete', { coffee });
     setEarly(0);
     setNote(thanks());
     // Count the receipt: it rolls from the last number this visitor printed.
