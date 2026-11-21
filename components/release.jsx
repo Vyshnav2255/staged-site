@@ -17,7 +17,7 @@ export function ReleaseProvider({ initial, children }) {
     let off = false;
     try {
       const hit = JSON.parse(sessionStorage.getItem(CACHE) || 'null');
-      if (hit?.tag) { setRelease(hit); setLive(true); return; }
+      if (hit?.tag && Date.now() - (hit.at || 0) < 10 * 60e3) { setRelease(hit); setLive(true); return; } // a tab left open still sees a new release
     } catch {}
     fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' } })
       .then((r) => (r.ok ? r.json() : null))
@@ -25,7 +25,7 @@ export function ReleaseProvider({ initial, children }) {
         const next = shapeRelease(j);
         if (!next || off) return;
         setRelease(next);
-        try { sessionStorage.setItem(CACHE, JSON.stringify(next)); } catch {}
+        try { sessionStorage.setItem(CACHE, JSON.stringify({ ...next, at: Date.now() })); } catch {}
       })
       .catch(() => {})
       .finally(() => { if (!off) setLive(true); });
