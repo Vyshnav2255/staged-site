@@ -65,6 +65,7 @@ const FAQ_GROUPS = { basics: 'the basics', privacy: 'privacy', setup: 'setup' };
 // Ordered basics, then privacy, then setup. FaqList prints a small label above each group.
 const FAQ = [
   { group: 'basics', q: 'Is it free?', a: <>Yes. There is no paid tier, no trial and no account.</> },
+  { group: 'basics', q: 'Is it open source?', a: <>It’s source-available. The code is public, you can use Staged free anywhere, including at work, and pull requests are welcome. You can’t publish, rebrand or sell your own version of it. See the <a href={`${GH}/blob/main/LICENSE`} rel="noopener">license</a>.</> },
   { group: 'basics', q: 'Will it commit or push without asking?', a: <>No. It only suggests. A commit is made when you add it to the cart, and nothing reaches your remote until you hold the push button. The last commit has an Undo.</> },
   { group: 'basics', q: 'What if it groups something wrong?', a: <>Drag a file onto another commit, or onto <em>Drop here for a new commit</em>. Staged remembers the move and groups those files together next time. A file that holds two features is split by chunk, and you can pick chunks yourself.</> },
   { group: 'basics', q: 'Can I choose the message style?', a: <>Yes, per project. Auto follows the style your repo already uses. You can also pick Gitmoji, Conventional Commits, or both, from the gear next to the repo name.</> },
@@ -166,6 +167,7 @@ export default async function Page() {
             <a href="#questions">FAQ</a>
             <a href={GH} rel="noopener">GitHub</a>
             <a href={`${GH}/releases`} rel="noopener">Changelog</a>
+            <a href={`${GH}/blob/main/LICENSE`} rel="noopener">License</a>
             <a href={BMC_URL} target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
           </nav>
           <span className="foot-by">Made with <svg className="heart" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-label="love" role="img"><path d="M19.46 3.99C16.78 2.35 14.44 3.01 13.03 4.07L12 4.85L10.97 4.07C9.56 3.01 7.22 2.35 4.54 3.99C1.02 6.15.22 13.27 8.34 19.27C9.89 20.42 10.66 20.99 12 20.99C13.34 20.99 14.11 20.42 15.66 19.27C23.78 13.27 22.98 6.15 19.46 3.99Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg> by <a href="https://x.com/vyshnav_xyz" rel="noopener">Vyshnav</a></span>
