@@ -85,7 +85,7 @@ export function DemoVideo() {
   return (
     <>
       <video ref={ref} autoPlay muted loop playsInline preload="metadata" poster={asset('/img/demo-light-poster.webp')} src={asset('/img/demo-light.mp4')}
-        aria-label="Staged in use: a suggested commit is added to the cart, the button is held to push, and a receipt prints." />
+        aria-label="Staged in use: a suggested commit is added to the cart, the button is held to push, a receipt prints, then Run starts the dev server." />
       {!still && (
         <button type="button" className="demo-ctl" onClick={toggle} aria-label={paused ? 'Play the demo' : 'Pause the demo'}>
           {paused

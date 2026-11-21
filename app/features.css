@@ -38,7 +38,7 @@
   transition: --a-paper var(--a-fade), --a-line var(--a-fade), --a-ink var(--a-fade), --a-text var(--a-fade), --a-acc var(--a-fade), --a-tint var(--a-fade), --a-fill var(--a-fade);
   --a-ease: var(--ease, cubic-bezier(.23, 1, .32, 1));
   position: relative; width: 100%; margin-top: 64px;
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 372px; gap: 16px;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(372px, auto); gap: 16px;
 }
 
 /* card: one white surface */
@@ -152,11 +152,94 @@
 @keyframes a-draw { from { stroke-dashoffset: 1; } }
 @keyframes a-pop { from { transform: scale(0); } }
 
+/* Run: one wide card with a working cassette deck, drawn like the app's Run
+   panel (run-deck.jsx). It is a real control, not a drawing, so it keeps the
+   app's tape colours: a dark tape under a cream label, green when live, amber
+   while it starts. */
+.bento .feat-run { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+.feat-run .feat-head { align-self: start; padding-bottom: 28px; }
+.feat-run .feat-art { height: 100%; padding: 32px 28px; background: linear-gradient(90deg, transparent, var(--surface-2, #faf9f6) 30%); }
+.rd-wrap { --rd-green: #4cbb6c; --rd-deep: #1f9a6a; --rd-lime: #c4e35a; --rd-amber: #eda100; --rd-red: #b42f2f;
+  width: 100%; max-width: 384px; display: flex; flex-direction: column; gap: 10px; font-family: var(--font-akt), sans-serif; }
+.rd-deck { position: relative; padding: 8px 12px 14px; border-radius: 16px; background: linear-gradient(#f4f3ef, #e4e2dc);
+  box-shadow: 0 0 0 .5px var(--line-strong, #cbc8bf), 0 1px 2px rgb(0 0 0 / .2), 0 8px 18px -10px rgb(20 18 12 / .35), inset 0 1px 0 rgb(255 255 255 / .9); }
+.rd-top { display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 4px 4px 2px; }
+.rd-brand { flex: 1; display: flex; align-items: center; gap: 4px; margin-left: 2px; color: #b9b6ad; text-shadow: 0 1px 0 rgb(255 255 255 / .9), 0 -1px 0 rgb(20 18 12 / .14); }
+.rd-brand .ic { filter: drop-shadow(0 1px 0 rgb(255 255 255 / .9)) drop-shadow(0 -.5px 0 rgb(20 18 12 / .2)); }
+.rd-brand b { font-weight: 600; font-size: 13px; letter-spacing: -.03em; }
+.rd-brand i { margin-left: 3px; padding-left: 7px; border-left: 1px solid #cfccc4; box-shadow: -1px 0 0 rgb(255 255 255 / .8); font-size: 8.5px; font-style: normal; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; }
+.rd-state { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted, #77756e); }
+.rd-deck.is-boot .rd-state, .rd-deck.is-stopping .rd-state { color: var(--ink-2, #3d3c38); }
+.rd-deck.is-live .rd-state { color: var(--rd-deep); }
+.rd-led { flex: none; display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong, #cbc8bf); box-shadow: inset 0 .5px 1px rgb(0 0 0 / .25); --c: var(--rd-green); }
+.rd-deck:is(.is-boot, .is-stopping) .rd-led { --c: var(--rd-amber); animation: rd-blink .8s ease-in-out infinite; }
+.rd-deck.is-live .rd-led { animation: rd-breathe 2s ease-in-out infinite; }
+.rd-deck:is(.is-boot, .is-live, .is-stopping) .rd-led { background: var(--c); box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--c) 20%, transparent), 0 0 7px color-mix(in srgb, var(--c) 70%, transparent); }
+@keyframes rd-breathe { 50% { opacity: .62; } }
+@keyframes rd-blink { 50% { opacity: .25; } }
+.rd-tape { position: relative; height: 164px; padding: 10px; border-radius: 11px; background: linear-gradient(#2c2c2a, #1b1b1a); box-shadow: inset 0 2px 5px rgb(0 0 0 / .55), inset 0 0 0 1px rgb(255 255 255 / .04), 0 1px 0 rgb(255 255 255 / .8); }
+.rd-label { position: relative; display: flex; flex-direction: column; height: 62px; padding: 11px 10px 0; border-radius: 4px; overflow: hidden; color: var(--ink, #0b0b0b); background: #fbf8ee; box-shadow: 0 1px 2px rgb(0 0 0 / .4); }
+.rd-label::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; background: var(--line-strong, #cbc8bf); transition: background-color .3s ease; }
+.rd-deck:is(.is-boot, .is-stopping) .rd-label::before { background: var(--rd-amber); }
+.rd-deck.is-live .rd-label::before { background: var(--rd-green); }
+.rd-main { display: block; padding-bottom: 3px; border-bottom: 1px solid color-mix(in srgb, var(--rd-deep) 16%, transparent); font-size: 15px; line-height: 1.25; font-weight: 500; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rd-main.mono { font-family: var(--font-mono), monospace; font-size: 14px; }
+.rd-main.is-quiet { color: var(--muted, #77756e); font-weight: 400; }
+.rd-cmd { padding: 6px 0 3px; border-bottom: 1px solid color-mix(in srgb, var(--rd-deep) 16%, transparent); font-size: 10.5px; line-height: 1.2; color: var(--muted, #77756e); font-variant-ligatures: none; white-space: nowrap; }
+.rd-deck.is-fresh .rd-label { animation: rd-label .6s cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes rd-label { from { transform: translateY(-8px) rotate(-1.5deg); opacity: 0; } }
+.rd-window { position: absolute; left: 38px; right: 38px; bottom: 14px; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 9px; border-radius: 32px; background: #0d0d0c; box-shadow: inset 0 0 0 2px #3a3a37, inset 0 3px 6px rgb(0 0 0 / .6); }
+.rd-reel { position: relative; z-index: 1; flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: #5a4632; transition: width 1.2s var(--a-ease), height 1.2s var(--a-ease), margin 1.2s var(--a-ease); }
+.rd-reel.is-r { width: 32px; height: 32px; margin-right: 7px; }
+.rd-deck:is(.is-live, .is-stopping) .rd-reel.is-l { width: 36px; height: 36px; margin-left: 5px; }
+.rd-deck:is(.is-live, .is-stopping) .rd-reel.is-r { width: 42px; height: 42px; margin-right: 2px; }
+.rd-reel i { width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle, #f2f0ea 0 4px, #1b1b1a 4px 5.5px, transparent 5.5px), repeating-conic-gradient(#e2dfd6 0 40deg, #9a978d 40deg 60deg); box-shadow: 0 0 0 1px rgb(0 0 0 / .4); }
+.rd-deck.is-live .rd-reel i { animation: rd-spin 2.4s linear infinite; }
+.rd-deck.is-boot .rd-reel i { animation: rd-spin .7s linear infinite; }
+.rd-deck.is-stopping .rd-reel i { animation: rd-spin 3.6s cubic-bezier(.2, .6, .4, 1) infinite; }
+@keyframes rd-spin { to { transform: rotate(-360deg); } }
+.rd-band { flex: 1; height: 3px; margin: 0 -4px 9px; align-self: flex-end; background: #5a4632; border-radius: 2px; }
+.rd-count { position: absolute; z-index: 2; left: 50%; top: 13px; transform: translateX(-50%); padding: 2px 6px; border-radius: 4px; background: #000; color: #6d6b64; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; box-shadow: inset 0 0 0 1px #34342f; font-variant-numeric: tabular-nums; }
+.rd-deck:is(.is-boot, .is-live) .rd-count { color: var(--rd-lime); }
+.rd-screw { position: absolute; bottom: 8px; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle, #555 0 1px, #2a2a28 1px); box-shadow: inset 0 0 0 1px #3d3d3a; }
+.rd-screw.is-a { left: 12px; } .rd-screw.is-b { right: 12px; }
+.rd-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-top: 12px; padding: 4px; border-radius: 13px; background: rgb(11 11 11 / .06); }
+.rd-k { position: relative; display: flex; align-items: center; justify-content: center; height: 40px; border: 0; border-radius: 9px; cursor: pointer; background: transparent; color: var(--ink, #0b0b0b);
+  transition: background-color .18s ease, color .18s ease, box-shadow .18s ease, transform .12s var(--a-ease); }
+.rd-k:active:not(:disabled) { transform: scale(.97); }
+.rd-k:disabled { cursor: default; }
+.rd-k:disabled:not(.is-down) .ic { opacity: .38; }
+.rd-k.is-down, .rd-k.is-on { background: #fff; box-shadow: 0 1px 2px rgb(20 18 12 / .12), 0 0 0 1px rgb(20 18 12 / .05); }
+.rd-k.is-down .ic { color: var(--rd-deep); }
+.rd-k.is-stop .ic { color: var(--rd-red); }
+.rd-k.is-ink:not(:disabled) { background: #0b0b0b; color: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .25); }
+@media (hover: hover) { .rd-k:not(:disabled):not(.is-down):not(.is-ink):not(.is-on):hover { background: rgb(11 11 11 / .06); } .rd-k.is-ink:not(:disabled):hover { background: #262624; } }
+.rd-k:focus-visible { outline: 2px solid var(--g2, #3fae5f); outline-offset: 2px; }
+.rd-k[data-tip]::after { content: attr(data-tip); position: absolute; left: 50%; top: calc(100% + 9px); z-index: 5; padding: 5px 8px; border-radius: 7px; background: #0b0b0b; color: #fff; font: 500 12px/16px var(--font-akt), sans-serif; white-space: nowrap; pointer-events: none; opacity: 0; transform: translate(-50%, -3px); transition: opacity .14s ease, transform .14s var(--a-ease); box-shadow: 0 4px 12px rgb(20 18 12 / .2); }
+.rd-k[data-tip]::before { content: ''; position: absolute; left: 50%; top: calc(100% + 4px); z-index: 6; margin-left: -5px; border: 5px solid transparent; border-top: 0; border-bottom-color: #0b0b0b; pointer-events: none; opacity: 0; transform: translateY(-3px); transition: opacity .14s ease, transform .14s var(--a-ease); }
+@media (hover: hover) { .rd-k[data-tip]:hover::before, .rd-k[data-tip]:hover::after { opacity: 1; transform: translate(-50%, 0); transition-delay: .25s; } .rd-k[data-tip]:hover::before { transform: none; } }
+.rd-k[data-tip]:focus-visible::before, .rd-k[data-tip]:focus-visible::after { opacity: 1; transform: translate(-50%, 0); } .rd-k[data-tip]:focus-visible::before { transform: none; }
+.rd-log { margin: 0; min-height: 76px; padding: 12px 14px; border-radius: 12px; background: #151514; color: #cfcdc3; font-size: 11.5px; line-height: 1.6; white-space: pre-wrap; font-variant-ligatures: none; box-shadow: inset 0 1px 3px rgb(0 0 0 / .4); }
+.rd-log .is-url { color: var(--rd-lime); }
+.rd-log .is-none { color: #77756e; }
+.rd-caret { display: inline-block; width: 6px; height: 12px; vertical-align: -2px; background: var(--rd-green); animation: rd-blink 1s steps(2) infinite; }
+.bento.is-blueprint .feat-run .feat-art { background: none; }
+/* wide screens: the output sits under the copy on the left, so the card keeps its height */
+@media (min-width: 900px) {
+  .feat-run .feat-art { position: static; }
+  .feat-run .rd-log { position: absolute; left: 28px; bottom: 28px; width: calc(50% - 56px); max-width: 440px; animation: rd-in .3s var(--a-ease) both; }
+  @keyframes rd-in { from { opacity: 0; transform: translateY(6px); } }
+}
+@media (prefers-reduced-motion: reduce) { .rd-wrap *, .rd-wrap *::before, .rd-wrap *::after { animation: none !important; transition: none !important; } }
+
 /* small screens: one column */
 @media (max-width: 899px) {
   .bento { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
   .feat-head { padding: 24px 24px 0; }
   .feat-art { flex: none; aspect-ratio: 2 / 1; max-height: 240px; padding: 4px 12px 16px; }
+  .bento .feat-run { grid-template-columns: minmax(0, 1fr); }
+  .feat-run .feat-head { padding-bottom: 0; }
+  .feat-run .feat-art { aspect-ratio: auto; max-height: none; padding: 20px 20px 24px; background: none; }
 }
 /* phones: the drawings shrink, so the smallest extras (hashes, line numbers,
    the fix lane's name) step aside */

@@ -122,6 +122,8 @@ h1 em { position: relative; display: inline-block; font-style: normal; padding-b
 .meta { margin-top: 18px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; font-size: 12.5px; line-height: 16px; letter-spacing: .01em; font-weight: 500; color: var(--muted); }
 .meta > * + *::before, .meta-row > * + *::before { content: ""; display: inline-block; width: 3px; height: 3px; margin: 0 12px; vertical-align: middle; border-radius: 50%; background: var(--line-strong); }
 .hero-meta > .meta-hint::before { display: none; }
+/* phones: the systems get their own line instead of a stray wrap */
+@media (max-width: 600px) { .hero-meta .meta-row > :nth-child(3) { flex-basis: 100%; margin-top: 8px; text-align: center; } .hero-meta .meta-row > :nth-child(3)::before { display: none; } }
 .hero-meta { position: relative; display: grid; justify-items: center; }
 .hero-meta > * { grid-area: 1 / 1; transition: opacity .3s ease, filter .3s ease; }
 .hero-meta .meta-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; }

@@ -73,7 +73,7 @@ const FAQ = [
   { group: 'privacy', q: 'Does my code leave my computer?', a: <>No. Staged is a small app that runs on your computer and reads your repos where they are. Grouping and messages come from its own rules, so there is no AI service and no server of ours. It checks GitHub for a new release when it starts, and your code is never part of that. Everything else goes out only when you push, to your own remote.</> },
   { group: 'privacy', q: 'Does it use AI?', a: <>No. Staged reads the diff itself: real imports, names a change adds and uses, which files you usually commit together, the comments you wrote. That is enough to sort a pile of changes and write subjects like <em>feat(printer): add a label printer</em>, instantly and offline.</> },
   { group: 'setup', q: 'What do I need to run it?', a: <>Node 18 or newer and git. <a href="#get">The command above</a> clones the latest release (<Version />) and runs <code>npm start</code>. It opens in your browser at <code>localhost</code> and updates itself when a new release is out.</> },
-  { group: 'setup', q: 'Which systems does it run on?', a: <>It is tested on macOS. Staged is a Node and git app, so other systems may work, but they are untested.</> },
+  { group: 'setup', q: 'Which systems does it run on?', a: <>macOS, Windows and Linux. Staged is a Node and git app, so all it needs is Node 18 or newer and git. The same command installs it everywhere.</> },
   { group: 'setup', q: 'How do I start it again?', a: <>Open a terminal, run <code>cd staged</code>, then <code>npm start</code>. It opens in your browser again.</> },
   { group: 'setup', q: 'Which repos does it show?', a: <>It finds the folder your repos live in, such as <code>~/GitHub</code> or <code>~/Developer</code>, and lists every git repo inside. You can add folders, add single repos, or hide one.</> },
   { group: 'setup', q: 'Does it work with GitLab and others?', a: <>Yes. It works on the git repo on your disk, so the host does not matter. Push goes wherever your remote points.</> },
@@ -107,7 +107,8 @@ export default async function Page() {
           <div className="cta in" id="get" style={{ '--i': 5 }}>
             <CopyCommand>
               <span>Free, no account</span>
-              <span>macOS, Node 18+</span>
+              <span>Node 18+</span>
+              <span>macOS, Windows, Linux</span>
             </CopyCommand>
           </div>
           <div className="demo in" style={{ '--i': 6 }}>

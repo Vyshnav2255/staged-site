@@ -6,8 +6,10 @@ import SortArt from '@/components/features/sort';
 import WriteArt from '@/components/features/write';
 import UndoArt from '@/components/features/undo';
 import HistoryArt from '@/components/features/history';
+import RunDeck from '@/components/features/run-deck';
 
-// The features grid: four cards, two by two (one column under 900px). Each card
+// The features grid: four cards, two by two (one column under 900px), then a
+// wide Run card with a working cassette deck like the app's (run-deck.jsx). Each card
 // is one white surface: a title, a line of copy, then one small conceptual
 // drawing (an inline SVG of a handful of shapes; rules at the top of
 // app/features.css). A drawing makes one small move while its card plays: on
@@ -135,6 +137,15 @@ export default function Features() {
           </div>
         </article>
       ))}
+      <article className="feat feat-run reveal" style={{ '--i': 4 }}>
+        <div className="feat-head">
+          <h3>Runs your project</h3>
+          <p>Serve the site or start the dev server from a little tape deck. The light goes green and the page opens once it is ready.</p>
+        </div>
+        <div className="feat-art">
+          <RunDeck />
+        </div>
+      </article>
       <KonamiHint />
     </div>
   );
