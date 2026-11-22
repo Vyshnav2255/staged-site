@@ -170,7 +170,7 @@ export default async function Page() {
             <a href={`${GH}/blob/main/LICENSE`} rel="noopener">License</a>
             <a href={BMC_URL} target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
           </nav>
-          <span className="foot-by">Made with <svg className="heart" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-label="love" role="img"><path d="M19.46 3.99C16.78 2.35 14.44 3.01 13.03 4.07L12 4.85L10.97 4.07C9.56 3.01 7.22 2.35 4.54 3.99C1.02 6.15.22 13.27 8.34 19.27C9.89 20.42 10.66 20.99 12 20.99C13.34 20.99 14.11 20.42 15.66 19.27C23.78 13.27 22.98 6.15 19.46 3.99Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg> by <a href="https://x.com/vyshnav_xyz" rel="noopener">Vyshnav</a></span>
+          <span className="foot-by">Made with <svg className="heart" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-label="love" role="img"><path d="M19.46 3.99C16.78 2.35 14.44 3.01 13.03 4.07L12 4.85L10.97 4.07C9.56 3.01 7.22 2.35 4.54 3.99C1.02 6.15.22 13.27 8.34 19.27C9.89 20.42 10.66 20.99 12 20.99C13.34 20.99 14.11 20.42 15.66 19.27C23.78 13.27 22.98 6.15 19.46 3.99Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg> by <a href="https://vyshnav.xyz" rel="noopener">Vyshnav</a></span>
         </div>
         <div className="wrap ghost-wrap reveal-self" aria-hidden="true">
           <svg className="ghost-mark" viewBox="0 0 24 24" fill="none">

@@ -19,6 +19,7 @@ export default function Analytics() {
       if (/buymeacoffee\.com/.test(href)) return track('coffee-link', { where: where(el) });
       if (/github\.com/.test(href)) return track(/releases/.test(href) ? 'changelog-link' : 'github-link', { where: where(el) });
       if (/x\.com|twitter\.com/.test(href)) return track('x-link', { where: where(el) });
+      if (/^https:\/\/vyshnav\.xyz\/?$/.test(href)) return track('maker-site-link', { where: where(el) });
     };
     const onEgg = (e) => track('easter-egg', { egg: String(e.detail) });
     const onCoffee = (e) => track('coffee-addon', { on: !!e.detail });
