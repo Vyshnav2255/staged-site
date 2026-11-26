@@ -2,6 +2,7 @@ import localFont from 'next/font/local';
 import './globals.css';
 import './delight.css';
 import './receipt.css';
+import './new.css';
 import { asset } from '@/lib/site';
 import Analytics from '@/components/analytics';
 

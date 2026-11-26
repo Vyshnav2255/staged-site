@@ -2,10 +2,11 @@ import { getLatestRelease } from '@/lib/release';
 import { GH, BMC_URL } from '@/lib/site';
 import { ReleaseProvider, Version } from '@/components/release';
 import CopyCommand from '@/components/copy-command';
-import SoundToggle from '@/components/sound-toggle';
 import HoldToPush from '@/components/hold-to-push';
 import { PageEffects, DemoVideo } from '@/components/effects';
 import Features from '@/components/features';
+import Swap from '@/components/swap';
+import WhatsNew, { AlsoNew } from '@/components/whats-new';
 import { BrandMark, GitHubMark } from '@/components/brand';
 import Delight from '@/components/delight';
 import FaqList from '@/components/delight/faq-list';
@@ -66,6 +67,7 @@ const FAQ_GROUPS = { basics: 'the basics', privacy: 'privacy', setup: 'setup' };
 const FAQ = [
   { group: 'basics', q: 'Is it free?', a: <>Yes. There is no paid tier, no trial and no account.</> },
   { group: 'basics', q: 'Is it open source?', a: <>It’s source-available. The code is public, you can use Staged free anywhere, including at work, and pull requests are welcome. You can’t publish, rebrand or sell your own version of it. See the <a href={`${GH}/blob/main/LICENSE`} rel="noopener">license</a>.</> },
+  { group: 'basics', q: 'Can it really replace the terminal?', a: <>For everyday git, yes. Committing, pushing, pulling, discarding, reading history and running your dev servers all happen in the app. You open a terminal once, to start Staged with <code>npm start</code>.</> },
   { group: 'basics', q: 'Will it commit or push without asking?', a: <>No. It only suggests. A commit is made when you add it to the cart, and nothing reaches your remote until you hold the push button. The last commit has an Undo.</> },
   { group: 'basics', q: 'What if it groups something wrong?', a: <>Drag a file onto another commit, or onto <em>Drop here for a new commit</em>. Staged remembers the move and groups those files together next time. A file that holds two features is split by chunk, and you can pick chunks yourself.</> },
   { group: 'basics', q: 'Can I choose the message style?', a: <>Yes, per project. Auto follows the style your repo already uses. You can also pick Gitmoji, Conventional Commits, or both, from the gear next to the repo name.</> },
@@ -101,10 +103,10 @@ export default async function Page() {
       <main id="top">
         <div className="hero wrap">
           <h1>
-            <span className="h1-line"><span style={{ '--l': 0 }}>Commit your work.</span></span>
-            <span className="h1-line h1-last"><span style={{ '--l': 1 }}><em>Properly.</em></span></span>
+            <span className="h1-line"><span style={{ '--l': 0 }}>Git, without</span></span>
+            <span className="h1-line h1-last"><span style={{ '--l': 1 }}><em>the terminal.</em></span></span>
           </h1>
-          <p className="sub in" style={{ '--i': 4 }}>Staged sorts your uncommitted changes into clean commits and writes the messages. You check them, add them to the cart, and hold to push.</p>
+          <p className="sub in" style={{ '--i': 4 }}>Staged is a fun, friendly app for git. It sorts your changes into clean commits and names them, then pushes, pulls and runs your dev servers. Nothing to type, nothing to remember.</p>
           <div className="cta in" id="get" style={{ '--i': 5 }}>
             <CopyCommand>
               <span>Free, no account</span>
@@ -126,16 +128,30 @@ export default async function Page() {
           <Features />
         </section>
 
+        <section className="wrap" id="terminal">
+          <Head n="02" label="no terminal" title={<><span className="h2-s">Every command</span> <span className="h2-s">is now a button.</span></>}>
+            <p className="lead">The things you type a dozen times a day each have a place in Staged, with a friendlier way to do them.</p>
+          </Head>
+          <Swap />
+        </section>
+
+        <section className="wrap" id="new">
+          <Head n="03" label="new in staged" title="Fresh out of the cart.">
+            <p className="lead">A new Home, a sharper grouping engine, dev servers on a cassette deck and a way to slim down heavy media.</p>
+          </Head>
+          <WhatsNew />
+          <AlsoNew />
+        </section>
+
         <section className="wrap" id="try">
-          <Head n="02" label="try it" title="Go on, hold it.">
-            <p className="lead">This is the real button. Let go early and nothing happens. Hold to the end and a receipt prints.</p>
-            <SoundToggle />
+          <Head n="04" label="try it" title="Go on, hold it.">
+            <p className="lead">Let go early and nothing happens. Hold to the end and a receipt prints.</p>
           </Head>
           <HoldToPush />
         </section>
 
         <section className="wrap" id="different">
-          <Head n="03" label="how it’s different" title={<><span className="h2-s">Most git tools make you sort.</span> <span className="h2-s">Staged sorts, then asks.</span></>}>
+          <Head n="05" label="how it’s different" title={<><span className="h2-s">Most git tools make you sort.</span> <span className="h2-s">Staged sorts, then asks.</span></>}>
           </Head>
           <div className="different reveal-group">
             {DIFFERENT.map((c) => (
@@ -151,7 +167,7 @@ export default async function Page() {
 
         <section className="wrap" id="questions">
           <FaqList items={FAQ} groups={FAQ_GROUPS}
-            kicker={<Kicker n="04">questions</Kicker>} />
+            kicker={<Kicker n="06">questions</Kicker>} />
         </section>
       </main>
 
@@ -163,6 +179,7 @@ export default async function Page() {
           </div>
           <nav aria-label="Footer">
             <a href="#what">Features</a>
+            <a href="#new">What’s new</a>
             <a href="#try">Try it</a>
             <a href="#questions">FAQ</a>
             <a href={GH} rel="noopener">GitHub</a>

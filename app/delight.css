@@ -58,7 +58,7 @@
 
 .feed { position: relative; transform-origin: 50% 20%; transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--rot, 0deg)); transition: transform .5s var(--spring); }
 .feed::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 480px; background: linear-gradient(90deg, rgb(120 110 90 / .05), transparent 10%, transparent 90%, rgb(120 110 90 / .05)), var(--paper); }
-.feed { filter: drop-shadow(0 1px 1px rgb(0 0 0 / .08)) drop-shadow(0 14px 18px rgb(20 18 12 / .12)); }
+.feed { filter: drop-shadow(0 1px 1px rgb(0 0 0 / .08)) drop-shadow(0 14px 18px rgb(12 10 9 / .12)); }
 .feed.is-torn::before { display: none; }
 .feed.is-dragging, .feed.is-torn { transition: none; }
 .feed.can-tear { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }

@@ -13,7 +13,7 @@ import { Receipt } from './receipt';
 import Tip from './tip';
 import { BMC_URL } from '@/lib/site';
 import CupIcon from './cup-icon';
-import CupArt from './cup-art';
+import SoundToggle from './sound-toggle';
 
 // The real push button, minus the push: hold it, ticks count the commits,
 // let go early and nothing happens, hold to the end and a receipt prints.
@@ -298,7 +298,6 @@ export default function HoldToPush() {
           <div className="htp-cart">
             <div className="htp-head">
               <span className="htp-title">Cart <i ref={badge} className="htp-count mono"><Odometer value={String(count)} /></i></span>
-              <span className="mono htp-branch"><BranchIcon />main → origin/main</span>
             </div>
             <ul>
               {CART.map((c, i) => (
@@ -307,34 +306,9 @@ export default function HoldToPush() {
                   <span className="htp-msg">{c.msg}</span>
                   <span className="mono htp-stat"><b className="add">+{c.add}</b><b className="del">−{c.del}</b></span>
                   <span className="mono htp-sub">{c.hash} · {c.files.length} files</span>
-                  <span className="htp-files">
-                    {c.files.slice(0, 3).map((f) => <span className="mono htp-file" key={f}>{f}</span>)}
-                    {c.files.length > 3 && <span className="mono htp-file">+{c.files.length - 3}</span>}
-                  </span>
                 </li>
               ))}
             </ul>
-
-            <div role="group" aria-label="Optional add-on" className={`htp-addon${coffee ? ' is-on' : ''}${locked ? ' is-locked' : ''}${litNow && coffee && p >= 0.95 ? ' is-lit' : ''}`}
-              onClick={(e) => { if (!e.target.closest('.addon-switch')) toggleCoffee(); }}>
-              <span className="addon-tag mono" aria-hidden="true">add-on</span>
-              <span ref={cupTile} className={`addon-cup${pour && coffee ? ' is-pour' : ''}`} key={pour}><CupArt full={coffee} className={pour && coffee ? 'is-pour' : ''} /></span>
-              <span className="addon-copy">
-                <b>Coffee for the maker</b>
-                <span className="addon-sub" key={coffee ? 'on' : 'off'}>
-                  <span className="addon-long">{coffee ? 'Added. It prints on your receipt.' : 'Optional. Staged is free either way.'}</span>
-                  <span className="addon-short">{coffee ? 'Added. Prints on the receipt.' : 'Optional.'}</span>
-                </span>
-              </span>
-              <span className="addon-qty mono">1 cup</span>
-              <button type="button" role="switch" aria-checked={coffee} className="addon-switch" disabled={locked}
-                aria-label="Add a coffee for the maker to the cart"
-                onClick={(e) => { e.stopPropagation(); toggleCoffee(); }}
-                onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') e.stopPropagation(); }}
-                onKeyUp={(e) => e.stopPropagation()}>
-                <span className="addon-knob"><Check size={10} className="knob-check" /><i className="knob-dot" /></span>
-              </button>
-            </div>
 
             <div className="htp-foot">
               <span>Total</span>
@@ -376,34 +350,14 @@ export default function HoldToPush() {
 
           <div ref={printer} className="htp-printer">
             <div className="htp-head-bar">
-              <i className="screw" aria-hidden="true" />
-              <span className="htp-title-wrap">
-                <span className="mono">receipt printer</span>
-                <span className="mono htp-model">ST-80</span>
-                <Tip as="button" type="button" className="hint-btn mono" aria-label="Hint" tip={<>psst… type <code>git push --force</code></>} align="start">?</Tip>
-              </span>
-              <i className="led" />
-              <i className="screw" aria-hidden="true" />
+              <span className="htp-title-wrap"><span className="mono">receipt printer</span></span>
+              <SoundToggle compact />
               <div className="htp-slot" />
             </div>
             <Smoke run={smoke} />
             <div className="htp-bay">
               <div className={`htp-ghost${ghost ? '' : ' is-gone'}`} aria-hidden={!ghost}>
-                <span className="g-line w60" /><span className="g-line w40" />
-                <span className="g-rule" />
-                <span className="g-line w80" /><span className="g-line w70" /><span className="g-line w75" />
-                <span className="g-coffee">
-                  <AnimatePresence initial={false}>
-                    {coffee && (
-                      <m.span key="g-coffee" className="g-coffee-in" initial={{ opacity: 0, scaleX: 0.6 }} animate={{ opacity: 1, scaleX: 1 }} exit={{ opacity: 0, transition: { duration: 0.2 } }} transition={SPRING}>
-                        <CupIcon size={12} /><span className="g-line w55" />
-                      </m.span>
-                    )}
-                  </AnimatePresence>
-                </span>
-                <span className="g-rule" />
                 <p className={`htp-hint${phase === 'early' ? ' is-early' : ''}`} key={ghostHint}>{ghostHint}</p>
-                <span className="g-qr" />
               </div>
               <div className="htp-slot-shade" aria-hidden="true" />
               <div className="htp-paper-clip" aria-hidden={!showPaper}>
