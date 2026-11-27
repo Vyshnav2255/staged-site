@@ -27,7 +27,7 @@ function Answer({ open, fallback, children }) {
 // The FAQ. Open every question and a twelfth one quietly shows up.
 export default function FaqList({ items, kicker, groups = {} }) {
   const [seen, setSeen] = useState(() => new Set([0]));
-  const [openIdx, setOpenIdx] = useState(0);
+  const [openIdx, setOpenIdx] = useState(-1);
   const [bonus, setBonus] = useState(false);
   const [fallback, setFallback] = useState(false);
   const total = items.length;
@@ -65,7 +65,7 @@ export default function FaqList({ items, kicker, groups = {} }) {
             {items.map(({ q, a, group }, i) => (
               <Fragment key={q}>
                 {groups[group] && group !== items[i - 1]?.group && <div className="faq-label mono" aria-hidden="true">{groups[group]}</div>}
-                <details open={i === 0} name="faq" onToggle={toggle(i)}>
+                <details name="faq" onToggle={toggle(i)}>
                   <summary onClick={click(i)}><span>{q}</span><Plus /></summary>
                   <Answer open={openIdx === i} fallback={fallback}><p>{a}</p></Answer>
                 </details>

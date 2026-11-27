@@ -14,6 +14,7 @@ import Tip from './tip';
 import { BMC_URL } from '@/lib/site';
 import CupIcon from './cup-icon';
 import SoundToggle from './sound-toggle';
+import CupArt from './cup-art';
 
 // The real push button, minus the push: hold it, ticks count the commits,
 // let go early and nothing happens, hold to the end and a receipt prints.
@@ -309,6 +310,27 @@ export default function HoldToPush() {
                 </li>
               ))}
             </ul>
+
+            <div role="group" aria-label="Optional add-on" className={`htp-addon${coffee ? ' is-on' : ''}${locked ? ' is-locked' : ''}${litNow && coffee && p >= 0.95 ? ' is-lit' : ''}`}
+              onClick={(e) => { if (!e.target.closest('.addon-switch')) toggleCoffee(); }}>
+              <span className="addon-tag mono" aria-hidden="true">add-on</span>
+              <span ref={cupTile} className={`addon-cup${pour && coffee ? ' is-pour' : ''}`} key={pour}><CupArt full={coffee} className={pour && coffee ? 'is-pour' : ''} /></span>
+              <span className="addon-copy">
+                <b>Coffee for the maker</b>
+                <span className="addon-sub" key={coffee ? 'on' : 'off'}>
+                  <span className="addon-long">{coffee ? 'Added. It prints on your receipt.' : 'Optional. Staged is free either way.'}</span>
+                  <span className="addon-short">{coffee ? 'Added. Prints on the receipt.' : 'Optional.'}</span>
+                </span>
+              </span>
+              <span className="addon-qty mono">1 cup</span>
+              <button type="button" role="switch" aria-checked={coffee} className="addon-switch" disabled={locked}
+                aria-label="Add a coffee for the maker to the cart"
+                onClick={(e) => { e.stopPropagation(); toggleCoffee(); }}
+                onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') e.stopPropagation(); }}
+                onKeyUp={(e) => e.stopPropagation()}>
+                <span className="addon-knob"><Check size={10} className="knob-check" /><i className="knob-dot" /></span>
+              </button>
+            </div>
 
             <div className="htp-foot">
               <span>Total</span>

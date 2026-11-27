@@ -138,7 +138,6 @@ export default function Features() {
           </div>
         </article>
       ))}
-      <KonamiHint />
     </div>
   );
 }

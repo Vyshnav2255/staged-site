@@ -31,7 +31,7 @@
 .wn-text { display: grid; grid-template-rows: 0fr; overflow: hidden; font-size: 14.5px; line-height: 22px; color: var(--ink-2); opacity: 0; transition: grid-template-rows var(--t-med) var(--ease), opacity var(--t-med) ease; }
 .wn-item.is-on .wn-text { grid-template-rows: 1fr; opacity: 1; }
 @supports (interpolate-size: allow-keywords) { .wn-text { display: block; height: 0; interpolate-size: allow-keywords; transition: height var(--t-med) var(--ease), opacity var(--t-med) ease; } .wn-item.is-on .wn-text { height: auto; } }
-.wn-screen { position: relative; aspect-ratio: 1440 / 900; border-radius: 14px; overflow: hidden; background: #0c0a09; box-shadow: 0 0 0 .5px rgb(12 10 9 / .22), 0 2px 4px rgb(12 10 9 / .05), 0 24px 48px -16px rgb(12 10 9 / .16), 0 64px 96px -48px rgb(12 10 9 / .2); }
+.wn-screen { position: relative; aspect-ratio: 1440 / 900; border-radius: 14px; overflow: hidden; background: #0c0a09; box-shadow: 0 0 0 .5px rgb(12 10 9 / .2), 0 1px 2px rgb(12 10 9 / .06), 0 12px 24px -12px rgb(12 10 9 / .14); }
 .wn-screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.01); transition: opacity .35s ease, transform .5s var(--ease); }
 .wn-screen img.is-on { opacity: 1; transform: none; }
 
@@ -69,3 +69,167 @@
 /* ---------- 04 try it, simplified (user, 2026-11-26): no add-on, no file chips, no printer trim ---------- */
 .htp-head-bar .sound-pill.is-compact { margin-left: auto; width: 32px; height: 32px; padding: 0; justify-content: center; box-shadow: var(--e1); }
 .htp-ghost { border: 0; }
+/* the total and the hold button sit at the bottom of the cart, like the app's cart panel */
+.htp-cart .htp-foot { margin-top: auto; }
+@media (max-width: 1000px) { .htp-cart .htp-foot { margin-top: 16px; } }
+.htp-cart .htp-addon + .htp-foot { margin-top: 16px; }
+/* Try it, smaller (2026-11-27, user: felt big): the whole widget scales down, so the receipt still fits */
+@media (min-width: 1001px) { .htp { zoom: .85; max-width: 1200px; margin-inline: auto; } }
+
+/* ---------- hero, round 17 (2026-11-27): the terminal gets struck out ---------- */
+.h1x .h1-last { padding-bottom: .3em; margin-bottom: -.22em; }
+.h1-term { position: relative; display: inline-flex; align-items: center; gap: .14em; margin: .06em 0 0; padding: .1em .26em .14em .26em; border-radius: .2em; vertical-align: baseline;
+  background: #0c0a09; box-shadow: 0 0 0 .5px rgb(12 10 9 / .6), inset 0 .5px 0 rgb(255 255 255 / .14), 0 1px 2px rgb(12 10 9 / .2), 0 14px 28px -14px rgb(12 10 9 / .45);
+  }
+.ht-win { display: inline-flex; flex-direction: column; gap: .07em; margin-right: .06em; align-self: flex-start; padding-top: .14em; }
+.ht-win i { display: block; width: .09em; height: .09em; border-radius: 50%; background: #44403c; }
+.ht-win i:first-child { background: #ef4444; } .ht-win i:nth-child(2) { background: #f59e0b; } .ht-win i:nth-child(3) { background: var(--g2); }
+.ht-text { position: relative; display: inline-flex; align-items: baseline; font-family: var(--font-mono), ui-monospace, monospace; font-weight: 500; font-size: .74em; letter-spacing: -.06em; color: #e7e5e4;
+  animation: ht-dim .5s 1.55s var(--ease) both; }
+@keyframes ht-dim { to { color: #78716c; } }
+.ht-prompt { font-family: var(--font-mono), ui-monospace, monospace; font-weight: 500; font-size: .74em; color: var(--g2); margin-right: .1em; }
+.ht-caret { display: inline-block; width: .34em; height: .62em; margin-left: .02em; align-self: center; background: var(--g1); animation: ht-blink 1s steps(2) infinite; }
+@keyframes ht-blink { 50% { opacity: 0; } }
+.ht-strike { position: absolute; left: -.12em; top: 54%; width: calc(100% + .24em); height: .42em; transform: translateY(-50%); overflow: visible; pointer-events: none; }
+.ht-strike path { fill: none; stroke: var(--g1); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1;
+  filter: drop-shadow(0 1px 0 rgb(12 10 9 / .35)); animation: draw .55s 1.05s cubic-bezier(.65, 0, .35, 1) forwards; }
+.h1-dot { color: var(--g2); }
+
+/* command → button ticker under the headline */
+.hswap { margin: 34px auto 0; height: 40px; display: flex; justify-content: center; overflow: clip; }
+.hs-row { display: inline-flex; align-items: center; gap: 12px; animation: hs-in .5s var(--ease) both; }
+@keyframes hs-in { from { opacity: 0; transform: translateY(14px); } }
+.hs-cmd { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 9px; background: color-mix(in srgb, var(--well) 70%, transparent); color: var(--ink-2); font-size: 13.5px; box-shadow: inset 0 0 0 .5px var(--hair); }
+.hs-p { color: var(--muted); }
+.hs-cmd s { text-decoration: none; position: relative; }
+.hs-cmd s::after { content: ""; position: absolute; left: -2px; right: -2px; top: 52%; height: 1.5px; border-radius: 2px; background: var(--ink-2); transform-origin: left; transform: scaleX(0); animation: hs-strike .4s .45s cubic-bezier(.65, 0, .35, 1) forwards; }
+.hs-cmd { animation: hs-fade .3s .85s ease forwards; }
+@keyframes hs-strike { to { transform: scaleX(1); } }
+@keyframes hs-fade { to { opacity: .55; } }
+.hs-arrow { color: var(--muted); opacity: 0; animation: hs-arrow .35s .85s var(--ease) forwards; }
+@keyframes hs-arrow { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+.hs-btn { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 14px; border-radius: 9px; background: var(--ink-grad); color: #fff; font-weight: 500; font-size: 14px; letter-spacing: -.01em; box-shadow: var(--ink-shadow);
+  opacity: 0; transform: scale(.6); animation: hs-pop .5s 1s cubic-bezier(.34, 1.56, .64, 1) forwards; }
+@keyframes hs-pop { to { opacity: 1; transform: none; } }
+.hs-live { width: 6px; height: 6px; border-radius: 50%; background: var(--g2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--g2) 30%, transparent); }
+.hswap + .sub { margin-top: 22px; font-size: 17px; line-height: 27px; max-width: 560px; }
+@media (max-width: 600px) {
+  .hswap { height: 68px; margin-top: 22px; align-items: center; }
+  .hs-row { flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .hs-cmd { font-size: 12px; height: 28px; } .hs-btn { height: 28px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ht-text, .ht-strike path, .hs-row, .hs-cmd, .hs-cmd s::after, .hs-arrow, .hs-btn { animation-duration: .01ms !important; animation-delay: 0s !important; }
+  .ht-caret { animation: none; }
+}
+.h1x + .sub { margin-top: 40px; }
+
+/* phones (2026-11-27 mobile pass) */
+@media (max-width: 600px) {
+  /* What's new tabs share the row instead of scrolling off the edge */
+  .wn-list { overflow: visible; gap: 4px; }
+  .wn-item { flex: 1 1 0; min-width: 0; padding: 8px 4px; justify-content: center; text-align: center; }
+  .wn-label { font-size: 12.5px; }
+  /* the cropped demo fades in from the left, so the cut reads as intentional */
+  .demo video { -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%); mask-image: linear-gradient(90deg, transparent, #000 22%); }
+  /* a calmer command bar */
+  .cmd { height: 52px; padding-left: 16px; gap: 10px; font-size: 13px; }
+  /* a shorter idle printer bay */
+  .htp-printer { min-height: 320px; }
+}
+
+/* footer: the phone layout at every width below desktop — centred logo + badge, link grid, credit (2026-11-27) */
+@media (max-width: 1000px) {
+  footer .foot-row { display: grid; justify-content: stretch; justify-items: center; gap: 24px; padding-top: 28px; }
+  .foot-left { justify-self: center; }
+  footer nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; width: min(100%, 420px); justify-self: center; }
+  footer nav a { display: inline-flex; align-items: center; min-height: 40px; justify-self: center; }
+  .foot-by { padding-top: 4px; font-size: 13px; justify-self: center; text-align: center; }
+}
+
+/* mobile review fixes (2026-11-27) */
+.nav-pill .btn { white-space: nowrap; }
+@media (max-width: 340px) { .nav-pill { padding-left: 16px; gap: 8px; } .nav-pill .btn { padding: 0 12px; } }
+@media (pointer: coarse) {
+  .wn-item { position: relative; }
+  .wn-item::after { content: ""; position: absolute; inset: -6px 0; }
+  .htp-head-bar .sound-pill.is-compact { position: relative; }
+  .htp-head-bar .sound-pill.is-compact::after { content: ""; position: absolute; inset: -6px; }
+  .addon-switch::after { content: ""; position: absolute; inset: -8px -4px; }
+}
+@media (min-width: 601px) and (max-width: 1000px) { .wn-list { justify-content: center; } }
+@media (max-width: 1000px) {
+  /* footer links: one centred, wrapping row instead of a lopsided grid */
+  footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 20px; width: auto; }
+  footer nav a { white-space: nowrap; }
+}
+@media (max-width: 899px) {
+  /* anchor jumps: less dead air under the nav (sections carry their own top padding) */
+  html { scroll-padding-top: 24px; }
+  .htp-printer { scroll-margin-top: 72px; }
+}
+@media (max-width: 600px) {
+  /* FAQ text on the same 24px edge as everything else; the open card bleeds a little */
+  .faq details { margin-inline: -12px; padding: 0 12px; }
+  .faq details + details::before { left: 12px; right: 12px; }
+  .faq-label { margin-left: 0; }
+  .htp-printer { min-height: 260px; }
+  .htp-ghost { padding-top: 56px; }
+  .wn-caption { min-height: 120px; }
+}
+@media (max-width: 400px) { .htp-hint { text-wrap: balance; } }
+@media (max-width: 360px) {
+  .sn-next { overflow: hidden; text-overflow: ellipsis; min-width: 0; white-space: nowrap; }
+  .htp-stat { grid-column: 2 / 4; grid-row: 3; justify-self: start; }
+  .htp-sub { grid-column: 2 / 4; }
+  .addon-copy b { font-size: 13px; letter-spacing: -.02em; }
+}
+
+/* simplified command bar (M1, user picked 2026-11-27) */
+.cx-pair { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; }
+.cx-pair .copy-tip { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.cx { position: relative; margin: 0; border: 0; background: none; color: var(--ink-2); cursor: pointer; -webkit-tap-highlight-color: transparent; font-family: var(--font-mono), monospace; }
+.cx-p { color: var(--muted); user-select: none; }
+.cx-t { white-space: nowrap; font-variant-ligatures: none; }
+.cx-t b { font-weight: 500; color: var(--ink); } .cx-t i { font-style: normal; color: var(--muted); }
+.cx-p, .cx-t, .cx-t b, .cx-t i { transition: color .3s ease; }
+.cx-ico { position: relative; flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; color: var(--muted); transition: color .15s ease; }
+.cx-ico svg { grid-area: 1 / 1; width: 14px; height: 14px; transition: transform .35s var(--ease), opacity .2s ease; }
+.cx-ico .i-check { opacity: 0; transform: scale(.6); } .cx-ico .i-check path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .35s var(--ease) .08s; }
+.cx:hover .cx-ico { color: var(--ink); }
+.cx.is-done .cx-ico { color: var(--g3); } .cx.is-done .cx-ico .i-copy { opacity: 0; transform: scale(.5); }
+.cx.is-done .cx-ico .i-check { opacity: 1; transform: none; } .cx.is-done .cx-ico .i-check path { stroke-dashoffset: 0; }
+.cx:active { transform: scale(.98); }
+@keyframes cx-ring { 0% { box-shadow: 0 0 0 1px var(--g2), 0 0 0 4px color-mix(in srgb, var(--g2) 20%, transparent), var(--cx-sh); } 100% { box-shadow: 0 0 0 1px transparent, 0 0 0 8px transparent, var(--cx-sh); } }
+@keyframes cx-wipe { 0% { transform: scaleX(0); opacity: 1; } 30% { transform: scaleX(1); opacity: 1; } 72% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
+.cx-wipe { position: absolute; inset: 4px; z-index: 0; border-radius: 8px; pointer-events: none; transform-origin: left center; transform: scaleX(0); background: linear-gradient(90deg, color-mix(in srgb, var(--g2) 14%, transparent), color-mix(in srgb, var(--g1) 26%, transparent)); }
+/* M1 short white line */
+.m1 { --cx-sh: var(--e2), var(--hi); display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 6px 0 16px; border-radius: 12px; background: var(--surface); box-shadow: var(--cx-sh); font-size: 13px; line-height: 20px; transition: box-shadow var(--t-med) var(--ease), transform var(--t-fast) var(--ease); }
+.m1:hover { box-shadow: 0 0 0 .5px color-mix(in srgb, var(--g2) 40%, var(--hair)), var(--e2-amb), var(--hi); }
+.m1 > :not(.cx-wipe) { position: relative; z-index: 1; } .m1 .cx-ico { margin-left: 2px; }
+.m1.is-done .cx-wipe { animation: cx-wipe 1.5s var(--ease) both; }
+.m1.is-done { animation: cx-ring .7s var(--ease); }
+.m1.is-done .cx-t, .m1.is-done .cx-t b, .m1.is-done .cx-p { color: var(--g4); } .m1.is-done .cx-t i { color: var(--g3); }
+.cx-pair.is-ping .cx { animation: cx-ring .7s var(--ease); }
+@media (pointer: coarse) { .cx { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) { .cx, .cx-wipe { animation: none !important; } }
+
+/* the copy burst: tiny square pixels rise from the bottom edge and sweep across (canvas, components/pixel-bloom.jsx) */
+.m1 { overflow: hidden; isolation: isolate; }
+.m1 .px-bloom { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; border-radius: inherit; }
+.m1 > :not(.px-bloom) { position: relative; z-index: 1; }
+
+/* footer ghost wordmark: green pixels where the pointer is (components/ghost-pixels.jsx) */
+.ghost-px { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+
+/* ghost wordmark: its ink spans exactly the nav pill's width (user, 2026-11-27) */
+footer { container-type: inline-size; }
+.ghost-wrap { font-size: calc(min(1200px, 100cqw - 64px) / 3.91) !important; justify-content: center; }
+@media (max-width: 600px) { .ghost-wrap { font-size: calc((100cqw - 48px) / 3.91) !important; } }
+/* …and it shows whole: no bottom fade, no negative margin, room for the g's tail (user, 2026-11-27) */
+.ghost-wrap { margin-bottom: 0 !important; padding-bottom: .3em !important;
+  -webkit-mask-image: linear-gradient(to top, transparent .06em, #000 .9em) !important; mask-image: linear-gradient(to top, transparent .06em, #000 .9em) !important; }
+/* debossed: pressed into the page — a soft shade on the top inner edge, a lit lip along the bottom */
+.ghost-wrap { color: #e9e7e4; text-shadow: none; }
+.ghost-word, .ghost-mark { filter: drop-shadow(0 -1.5px .5px rgb(12 10 9 / .09)) drop-shadow(0 1.5px 0 rgb(255 255 255 / .95)); }
+.ghost-mark .gb { stroke: #e9e7e4; } .ghost-mark .gb.b3 { fill: #e9e7e4; }

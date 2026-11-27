@@ -1,7 +1,9 @@
 import { getLatestRelease } from '@/lib/release';
 import { GH, BMC_URL } from '@/lib/site';
 import { ReleaseProvider, Version } from '@/components/release';
+import { HeroTitle } from '@/components/hero-title';
 import CopyCommand from '@/components/copy-command';
+import GhostPixels from '@/components/ghost-pixels';
 import HoldToPush from '@/components/hold-to-push';
 import { PageEffects, DemoVideo } from '@/components/effects';
 import Features from '@/components/features';
@@ -102,11 +104,8 @@ export default async function Page() {
 
       <main id="top">
         <div className="hero wrap">
-          <h1>
-            <span className="h1-line"><span style={{ '--l': 0 }}>Git, without</span></span>
-            <span className="h1-line h1-last"><span style={{ '--l': 1 }}><em>the terminal.</em></span></span>
-          </h1>
-          <p className="sub in" style={{ '--i': 4 }}>Staged is a fun, friendly app for git. It sorts your changes into clean commits and names them, then pushes, pulls and runs your dev servers. Nothing to type, nothing to remember.</p>
+          <HeroTitle />
+          <p className="sub in" style={{ '--i': 4 }}>Staged is a fun, friendly app for git. It sorts your changes into clean commits, names them, and pushes when you hold. Nothing to type, nothing to remember.</p>
           <div className="cta in" id="get" style={{ '--i': 5 }}>
             <CopyCommand>
               <span>Free, no account</span>
@@ -179,9 +178,6 @@ export default async function Page() {
           </div>
           <nav aria-label="Footer">
             <a href="#what">Features</a>
-            <a href="#new">What’s new</a>
-            <a href="#try">Try it</a>
-            <a href="#questions">FAQ</a>
             <a href={GH} rel="noopener">GitHub</a>
             <a href={`${GH}/releases`} rel="noopener">Changelog</a>
             <a href={`${GH}/blob/main/LICENSE`} rel="noopener">License</a>
@@ -196,6 +192,7 @@ export default async function Page() {
             <path className="gb b1" d="M4 6H20" />
           </svg>
           <span className="ghost-word">staged</span>
+          <GhostPixels />
         </div>
       </footer>
     </ReleaseProvider>

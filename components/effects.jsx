@@ -84,20 +84,8 @@ export function DemoVideo() {
   };
   return (
     <>
-      <video ref={ref} autoPlay muted loop playsInline preload="metadata" poster={asset('/img/demo-light-poster.webp?v=2')} src={asset('/img/demo-light.mp4?v=2')}
+      <video ref={ref} autoPlay muted loop playsInline preload="metadata" poster={asset('/img/demo-light-poster.webp?v=5')} src={asset('/img/demo-light.mp4?v=5')}
         aria-label="Staged in use: a suggested commit is added to the cart, the button is held to push, a receipt prints, then Run starts the dev server." />
-      {!still && (
-        <button type="button" className="demo-ctl" onClick={toggle} aria-label={paused ? 'Play the demo' : 'Pause the demo'}>
-          {paused
-            ? <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><path d="M18.9 12.9C18.5 14.4 16.8 15.4 13.4 17.4C10.1 19.3 8.5 20.3 7.1 19.9C6.6 19.7 6.1 19.4 5.7 19C4.7 18 4.7 16 4.7 12C4.7 8 4.7 6 5.7 5C6.1 4.6 6.6 4.3 7.1 4.1C8.5 3.7 10.1 4.7 13.4 6.6C16.8 8.6 18.5 9.6 18.9 11.1C19.1 11.7 19.1 12.3 18.9 12.9Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /></svg>
-            : <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><path d="M4 7C4 5.6 4 4.9 4.4 4.4C4.9 4 5.6 4 7 4C8.4 4 9.1 4 9.6 4.4C10 4.9 10 5.6 10 7V17C10 18.4 10 19.1 9.6 19.6C9.1 20 8.4 20 7 20C5.6 20 4.9 20 4.4 19.6C4 19.1 4 18.4 4 17V7Z" stroke="currentColor" strokeWidth="1.5" /><path d="M14 7C14 5.6 14 4.9 14.4 4.4C14.9 4 15.6 4 17 4C18.4 4 19.1 4 19.6 4.4C20 4.9 20 5.6 20 7V17C20 18.4 20 19.1 19.6 19.6C19.1 20 18.4 20 17 20C15.6 20 14.9 20 14.4 19.6C14 19.1 14 18.4 14 17V7Z" stroke="currentColor" strokeWidth="1.5" /></svg>}
-        </button>
-      )}
-      {!still && (
-        <button type="button" className="demo-ctl demo-full" onClick={full} aria-label="Watch the demo full screen">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><path d="M4 9V7C4 5.34 5.34 4 7 4H9M15 4H17C18.66 4 20 5.34 20 7V9M20 15V17C20 18.66 18.66 20 17 20H15M9 20H7C5.34 20 4 18.66 4 17V15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-        </button>
-      )}
     </>
   );
 }
